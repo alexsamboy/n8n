@@ -1,0 +1,835 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciales": {
+      "main": [
+        [
+          {
+            "node": "GraphQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GraphQL": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "GetBanner",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Actividades",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "GetBanner": {
+      "main": [
+        [
+          {
+            "node": "Banners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actividades": {
+      "main": [
+        [
+          {
+            "node": "MJML_Actividades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banners": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciales1": {
+      "main": [
+        [
+          {
+            "node": "GraphQL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Credenciales1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GraphQL1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Actividades1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GetBanner1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetBanner1": {
+      "main": [
+        [
+          {
+            "node": "Banners1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Banners1": {
+      "main": [
+        [
+          {
+            "node": "ExistenBanners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ExistenBanners": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actividades1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-11-25T14:28:01.485Z",
+  "id": "yD5Ycriuh8cVFqIT",
+  "isArchived": false,
+  "meta": null,
+  "name": "Agenda PUCMM",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        176
+      ],
+      "id": "66b9b8aa-b834-4529-8163-cbb5759cf81d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = $now;\n\n// Cálculos base\nconst esLunes = now.weekday === 1;\n\nconst inicioSemana = now\n  .startOf(\"week\")\n  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n\nconst inicioMes = now\n  .startOf(\"month\")\n  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n\nconst finMes = now\n  .endOf(\"month\")\n  .set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n\nconst esPrimerLunesMes =\n  esLunes && Number(now.toFormat(\"dd\")) <= 7;\n\n// Determinar rango dinámico DateFrom\nlet dateFrom;\nif (esPrimerLunesMes) {\n  dateFrom = inicioMes;\n} else if (esLunes) {\n  dateFrom = inicioSemana;\n} else {\n  dateFrom = now.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n}\n\n// Determinar rango dinámico DateTo\nlet dateTo;\nif (esPrimerLunesMes) {\n  dateTo = finMes;\n} else if (esLunes) {\n  dateTo = now\n    .endOf(\"week\")\n    .set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n} else {\n  dateTo = now.set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n}\n\n// Devolver en un solo item\nreturn [\n  {\n    json: {\n      var: {\n        AhoraLocal: now.toISO(),\n        EsLunes: esLunes,\n        InicioSemanaLocal: inicioSemana.toISO(),\n        InicioMesLocal: inicioMes.toISO(),\n        FinMesLocal: finMes.toISO(),\n        EsPrimerLunesMes: esPrimerLunesMes,\n        DateFrom: dateFrom.toISO(),\n        DateTo: dateTo.toISO(),\n        cursor:\"\"\n      },\n\n      data: {\n        user: \"mperez\",\n        base: \"https://dia.pucmm.edu.do\",\n        graph: \"/graphql\",\n        rest: \"/wp-json/wp/v2\",\n        key: \"mw5s 7Pjd WRXH 2KdE m4sV Dyro\"\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -144
+      ],
+      "id": "ca510199-6efe-428f-b276-d0a0e41945ec",
+      "name": "Credenciales"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$json.data.base + $json.data.graph}}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"query\": \"query PostsDesdeFecha($fechaInicio: String!, $fechaTermino: String!, $cursor: String) { posts(first: 100 after: $cursor where: { status: PUBLISH metaQuery: { relation: AND, metaArray: [ { key: \\\"fecha_inicio\\\", value: $fechaInicio, compare: GREATER_THAN_OR_EQUAL_TO, type: DATETIME }, { key: \\\"fecha_termino\\\", value: $fechaTermino, compare: LESS_THAN_OR_EQUAL_TO, type: DATETIME } ] } }) { pageInfo { hasNextPage endCursor } nodes { databaseId title link featuredImage{ node{ sourceUrl } } categories { nodes { name } } detallesDelEvento { detcampus modalidad status } horaYFechaDelEvento { fechaInicio horaDeInicio fechaTermino horaTermino } locations { nodes { name } } organizer { nodes { name organizador { nomCsd telCsd correoCsd } } } } } }\",\n  \"variables\": {\n    \"fechaInicio\": \"{{ $json.var.DateFrom }}\",\n    \"fechaTermino\": \"{{ $json.var.DateTo }}\",\n    \"cursor\": \"{{$json.cursor || ''}}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        240,
+        -144
+      ],
+      "id": "619fbbb6-9625-4ee2-abe0-463906afa099",
+      "name": "GraphQL",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "o18KGnsbGFIxrl5O",
+          "name": "DiaPUCMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eb6c54df-0550-4a0a-b367-60abe3cdfd9a",
+              "leftValue": "={{ $json.data.posts.nodes.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -144
+      ],
+      "id": "17da5ffc-0849-4909-9546-692b1d5be079",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciales').item.json.data.base +  $('Credenciales').item.json.data.graph}}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"query\": \"query GetBanners($inicio: String!, $fin: String!, $cursor: String) { banners(first: 100, after: $cursor, where: { status: PUBLISH, metaQuery: { relation: AND, metaArray: [ { key: \\\"inicio\\\", value: $inicio, compare: LESS_THAN_OR_EQUAL_TO, type: DATETIME }, { key: \\\"fin\\\", value: $fin, compare: GREATER_THAN_OR_EQUAL_TO, type: DATETIME } ] } }) { pageInfo { hasNextPage endCursor } nodes { databaseId title newsletter { inicio fin enlace } featuredImage { node { sourceUrl } } } } }\",\n  \"variables\": {\n    \"inicio\": \"{{ $('Credenciales').item.json.var.DateFrom }}\",\n    \"fin\": \"{{ $('Credenciales').item.json.var.DateTo }}\",\n    \"cursor\": \"{{ $json.cursor || '' }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        688,
+        -240
+      ],
+      "id": "821b5635-44c3-43f4-8376-ab92bcaf44d0",
+      "name": "GetBanner",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "o18KGnsbGFIxrl5O",
+          "name": "DiaPUCMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomar todos los items que llegan del nodo anterior\nconst items = $input.all();\n\n// Función para corregir timezone\nconst fixTZ = (d) => d?.replace(\"+00:00\", \"-04:00\") || null;\n\n// Lista final\nconst output = [];\n\n// Procesar cada item entrante\nfor (const item of items) {\n\n  // Extraer nodes de GraphQL\n  const nodes = item.json?.data?.banners?.nodes || [];\n\n  // Procesar cada result dentro de nodes[]\n  for (const node of nodes) {\n\n    // Transformación final del JSON\n    output.push({\n      json: {\n        id: node.databaseId || null,\n        titulo: node.title || \"\",\n        inicio: fixTZ(node.newsletter?.inicio),\n        fin: fixTZ(node.newsletter?.fin),\n        enlaces: node.newsletter?.enlace || \"\",\n        imagen: node.featuredImage?.node?.sourceUrl || \"\",\n\n      }\n    });\n  }\n}\n\n// Devolver los items transformados\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -240
+      ],
+      "id": "b55121d4-0ed0-4a7a-853c-9ac10e57bee5",
+      "name": "Banners"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomar todos los items que llegan del nodo anterior\nconst items = $input.all();\n\n// Función para corregir timezone\nconst fixTZ = (d) => d?.replace(\"+00:00\", \"-04:00\") || null;\n\n// Lista final\nconst output = [];\n\n// Procesar cada item entrante\nfor (const item of items) {\n\n  // Extraer nodes de GraphQL\n  const nodes = item.json?.data?.posts?.nodes || [];\n\n  // Procesar cada result dentro de nodes[]\n  for (const node of nodes) {\n\n    // Transformación final del JSON\n    output.push({\n      json: {\n        id: node.databaseId || null,\n        titulo: node.title || \"\",\n        status: node.detallesDelEvento?.status,\n        categoria:node.categories.nodes[0]?.name,\n        campus: node.detallesDelEvento?.detcampus,\n        modalidad: node.detallesDelEvento?.modalidad,\n        inicio: fixTZ(node.horaYFechaDelEvento?.fechaInicio),\n        fin: fixTZ(node.horaYFechaDelEvento?.fechaTermino),\n        enlace: node?.link || \"\",\n        imagen: node.featuredImage?.node?.sourceUrl || \"\",\n        lugar: node.locations.nodes[0]?.name,\n        organiza: {\n          dept: node.organizer.nodes[0]?.name,\n          nombre: node.organizer.nodes[0].organizador?.nomCsd || \"\",\n          tel: node.organizer.nodes[0].organizador?.telCsd || \"\",\n          email: node.organizer.nodes[0].organizador?.correoCsd || \"\",\n          \n        }\n\n      }\n    });\n  }\n}\n\n// Devolver los items transformados\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -48
+      ],
+      "id": "7dd47048-a8a3-47f2-a105-177359f1ccd4",
+      "name": "Actividades"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Recoger data de los nodos previos ---\nconst banners = $('Banners').all().map(i => i.json);\nconst actividades = $('Actividades').all().map(i => i.json);\n\n// --- Función para renderizar banner ---\nfunction renderBanner(b) {\n  return `\n    <!-- Publicidad -->\n      <mj-section padding=\"0px\" background-color=\"white\">\n        <mj-column padding=\"10px 0\">\n          <mj-image href=\"${b.enlaces}\" src=\"${b.imagen}\" fluid-on-mobile=\"true\" title=\"${b.titulo}\" padding=\"0px\" />\n        </mj-column>\n      </mj-section>\n    <!-- Publicidad -->\n  `;\n}\n\n// --- Función para renderizar actividades ---\nfunction renderActividad(a) {\n  return `\n    <tr>\n      <td style=\"padding:15px;\">\n        <h3 style=\"font-family:Arial; color:#0063A4;\">${a.titulo}</h3>\n        <p><strong>Fecha:</strong> ${a.inicio} → ${a.fin}</p>\n        <p><strong>Lugar:</strong> ${a.lugar}</p>\n        <p><strong>Organiza:</strong> ${a.organiza.nombre}</p>\n        <a href=\"${a.enlace}\" \n           style=\"padding:8px 15px; background:#0095D9; \n                  color:white; text-decoration:none; border-radius:4px;\">\n          Ver detalles\n        </a>\n      </td>\n    </tr>\n  `;\n}\n\n// --- Construcción del HTML final ---\n\nlet html = `\n  <html>\n  <body style=\"font-family:Arial; background:#ffffff;\">\n\n    <h1 style=\"text-align:center; color:#0063A4;\">Noticias y Actividades PUCMM</h1>\n\n    <!-- SECTION BANNERS -->\n    ${banners.map(renderBanner).join('')}\n\n    <hr/>\n\n    <!-- SECTION ACTIVIDADES -->\n    <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n      ${actividades.map(renderActividad).join('')}\n    </table>\n\n  </body>\n  </html>\n`;\n\nreturn [{ json: { html } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -240
+      ],
+      "id": "12837046-6e3f-4960-84b1-c5540206d333",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === Recibir items del nodo Actividades ===\nconst actividades = $('Actividades').all().map(i => i.json);\n\n// === Función para generar cada tarjeta MJML ===\nfunction tarjetaActividad(a) {\n  return `\n    <mj-group css-class=\"row\">\n      <mj-column width=\"15%\" padding=\"5px\" border=\"solid #00369c 3px\" vertical-align=\"middle\">\n        <mj-text font-size=\"30px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" align=\"center\">\n          ${a.fecha?.dia || ''}\n        </mj-text>\n        <mj-text font-size=\"14px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" text-transform=\"uppercase\" align=\"center\">\n          ${a.fecha?.mes || ''}\n        </mj-text>\n      </mj-column>\n\n      <mj-column width=\"85%\" padding=\"5px 10px\" vertical-align=\"middle\">\n        <mj-text font-size=\"16px\" color=\"black\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"500\">\n          <a href=\"${a.enlace}\" title=\"${a.titulo}\" style=\"color:black; text-decoration:none;\">\n            <p style=\"margin:0; line-height:1.1rem;\">\n              <b>${a.categoria ? a.categoria + ' | ' : ''}${a.titulo}</b>\n            </p>\n          </a>\n        </mj-text>\n\n        <mj-table align=\"left\" font-size=\"11px\" width=\"100%\" padding=\"5px 0px 0px 0px\" line-height=\"11px\">\n          <tr>\n            <td style=\"text-align:center;\">🕒 ${a.hora || ''}</td>\n\n            <td style=\"text-align:center; border-left:solid 1px gray;border-right:solid 1px gray;\">\n              🏛️ <span title=\"${a.lugar}\">\n                  ${a.lugar?.length <= 22 ? a.lugar : a.lugar?.substring(0,22)}\n              </span>\n            </td>\n\n            <td style=\"text-align:center;\">\n              ${\n                (a.modalidad === 'Virtual' || a.lugar === 'Vía Zoom')\n                ? '🖥️ Virtual'\n                : `📍 ${a.campus || ''}`\n              }\n            </td>\n          </tr>\n        </mj-table>\n      </mj-column>\n    </mj-group>\n  `;\n}\n\n// === Construcción del MJML final ===\nlet mjml = `\n  <!-- Actividades -->\n  <mj-section background-color=\"white\" padding=\"0px 20px\" full-width=\"full-width\">\n    ${actividades.map(tarjetaActividad).join('')}\n  </mj-section>\n  <!-- /Actividades -->\n`;\n\n// Devolver como variable global\nreturn [{ json: { mjml } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -48
+      ],
+      "id": "fd8930a2-d7af-4f23-aa9e-9a6ff3156bc1",
+      "name": "MJML_Actividades"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        368
+      ],
+      "id": "10effa71-262d-43de-a123-ce24477e1e90",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4026651-d5a6-4bcb-bfbb-8410ba74ad0a",
+              "name": "Hoy",
+              "value": "={{$now}}",
+              "type": "string"
+            },
+            {
+              "id": "e2c1b324-049e-49d0-8110-c88af6bbcf48",
+              "name": "dayOfWeek",
+              "value": "={{ new Date().getDay() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        272
+      ],
+      "id": "086a12b7-53d4-43dd-b3f9-65e342c16693",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "31214fb1-1a43-43ae-936e-da8472d94077",
+              "leftValue": "={{ $json.dayOfWeek }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        272
+      ],
+      "id": "50e9791a-2491-4ddc-b5ae-c02395193c67",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = $now;\n\n// Cálculos base\nconst esLunes = now.weekday === 1;\n\nconst inicioSemana = now\n  .startOf(\"week\")\n  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n\nconst inicioMes = now\n  .startOf(\"month\")\n  .set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n\nconst finMes = now\n  .endOf(\"month\")\n  .set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n\nconst esPrimerLunesMes =\n  esLunes && Number(now.toFormat(\"dd\")) <= 7;\n\n// Determinar rango dinámico DateFrom\nlet dateFrom;\nif (esPrimerLunesMes) {\n  dateFrom = inicioMes;\n} else if (esLunes) {\n  dateFrom = inicioSemana;\n} else {\n  dateFrom = now.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });\n}\n\n// Determinar rango dinámico DateTo\nlet dateTo;\nif (esPrimerLunesMes) {\n  dateTo = finMes;\n} else if (esLunes) {\n  dateTo = now\n    .endOf(\"week\")\n    .set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n} else {\n  dateTo = now.set({ hour: 23, minute: 59, second: 59, millisecond: 0 });\n}\n\n// Devolver en un solo item\nreturn [\n  {\n    json: {\n      var: {\n        AhoraLocal: now.toISO(),\n        EsLunes: esLunes,\n        InicioSemanaLocal: inicioSemana.toISO(),\n        InicioMesLocal: inicioMes.toISO(),\n        FinMesLocal: finMes.toISO(),\n        EsPrimerLunesMes: esPrimerLunesMes,\n        DateFrom: dateFrom.toISO(),\n        DateTo: dateTo.toISO(),\n        cursor:\"\"\n      },\n\n      data: {\n        user: \"mperez\",\n        base: \"https://dia.pucmm.edu.do\",\n        graph: \"/graphql\",\n        rest: \"/wp-json/wp/v2\",\n        key: \"mw5s 7Pjd WRXH 2KdE m4sV Dyro\"\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        272
+      ],
+      "id": "07ca3cbd-05d8-497c-8dcc-7f5d04f0e45d",
+      "name": "Credenciales1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$json.data.base + $json.data.graph}}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"query\": \"query PostsDesdeFecha($fechaInicio: String!, $fechaTermino: String!, $cursor: String) { posts(first: 100 after: $cursor where: { status: PUBLISH metaQuery: { relation: AND, metaArray: [ { key: \\\"fecha_inicio\\\", value: $fechaInicio, compare: GREATER_THAN_OR_EQUAL_TO, type: DATETIME }, { key: \\\"fecha_termino\\\", value: $fechaTermino, compare: LESS_THAN_OR_EQUAL_TO, type: DATETIME } ] } }) { pageInfo { hasNextPage endCursor } nodes { databaseId title link featuredImage{ node{ sourceUrl } } categories { nodes { name } } detallesDelEvento { detcampus modalidad status } horaYFechaDelEvento { fechaInicio horaDeInicio fechaTermino horaTermino } locations { nodes { name } } organizer { nodes { name organizador { nomCsd telCsd correoCsd } } } } } }\",\n  \"variables\": {\n    \"fechaInicio\": \"{{ $json.var.DateFrom }}\",\n    \"fechaTermino\": \"{{ $json.var.DateTo }}\",\n    \"cursor\": \"{{$json.cursor || ''}}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        912,
+        272
+      ],
+      "id": "e35b592c-a530-4df2-8ca1-903f9889097b",
+      "name": "GraphQL1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "o18KGnsbGFIxrl5O",
+          "name": "DiaPUCMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "31214fb1-1a43-43ae-936e-da8472d94077",
+              "leftValue": "={{ $json.data.posts.nodes.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        272
+      ],
+      "id": "22b0ed8c-201d-497d-9137-a9984c65d17d",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomar todos los items que llegan del nodo anterior\nconst items = $input.all();\n\n// Función para corregir timezone\nconst fixTZ = (d) => d?.replace(\"+00:00\", \"-04:00\") || null;\n\n// Lista final\nconst output = [];\n\n// Procesar cada item entrante\nfor (const item of items) {\n\n  // Extraer nodes de GraphQL\n  const nodes = item.json?.data?.posts?.nodes || [];\n\n  // Procesar cada result dentro de nodes[]\n  for (const node of nodes) {\n\n    // Transformación final del JSON\n    output.push({\n      json: {\n        id: node.databaseId || null,\n        titulo: node.title || \"\",\n        status: node.detallesDelEvento?.status,\n        categoria:node.categories.nodes[0]?.name,\n        campus: node.detallesDelEvento?.detcampus,\n        modalidad: node.detallesDelEvento?.modalidad,\n        inicio: fixTZ(node.horaYFechaDelEvento?.fechaInicio),\n        fin: fixTZ(node.horaYFechaDelEvento?.fechaTermino),\n        enlace: node?.link || \"\",\n        imagen: node.featuredImage?.node?.sourceUrl || \"\",\n        lugar: node.locations.nodes[0]?.name,\n        organiza: {\n          dept: node.organizer.nodes[0]?.name,\n          nombre: node.organizer.nodes[0].organizador?.nomCsd || \"\",\n          tel: node.organizer.nodes[0].organizador?.telCsd || \"\",\n          email: node.organizer.nodes[0].organizador?.correoCsd || \"\",\n          \n        }\n\n      }\n    });\n  }\n}\n\n// Devolver los items transformados\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        176
+      ],
+      "id": "2aa3b1be-c5f0-4489-b800-420b2518c075",
+      "name": "Actividades1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciales1').item.json.data.base + $('Credenciales1').item.json.data.graph }}\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"query\": \"query GetBanners($inicio: String!, $fin: String!, $cursor: String) { banners(first: 100, after: $cursor, where: { status: PUBLISH, metaQuery: { relation: AND, metaArray: [ { key: \\\"inicio\\\", value: $inicio, compare: LESS_THAN_OR_EQUAL_TO, type: DATETIME }, { key: \\\"fin\\\", value: $fin, compare: GREATER_THAN_OR_EQUAL_TO, type: DATETIME } ] } }) { pageInfo { hasNextPage endCursor } nodes { databaseId title newsletter { inicio fin enlace } featuredImage { node { sourceUrl } } } } }\",\n  \"variables\": {\n    \"inicio\": \"{{ $('Credenciales1').item.json.var.DateFrom }}\",\n    \"fin\": \"{{ $('Credenciales1').item.json.var.DateTo }}\",\n    \"cursor\": \"{{ $json.cursor || '' }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1360,
+        368
+      ],
+      "id": "3e6c1f94-b4ba-4203-a422-650c2850591e",
+      "name": "GetBanner1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "o18KGnsbGFIxrl5O",
+          "name": "DiaPUCMM"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomar todos los items que llegan del nodo anterior\nconst items = $input.all();\n\n// Función para corregir timezone\nconst fixTZ = (d) => d?.replace(\"+00:00\", \"-04:00\") || null;\n\n// Lista final\nconst output = [];\n\n// Procesar cada item entrante\nfor (const item of items) {\n\n  // Extraer nodes de GraphQL\n  const nodes = item.json?.data?.banners?.nodes || [];\n\n  // Procesar cada result dentro de nodes[]\n  for (const node of nodes) {\n\n    // Transformación final del JSON\n    output.push({\n      json: {\n        id: node.databaseId || null,\n        titulo: node.title || \"\",\n        inicio: fixTZ(node.newsletter?.inicio),\n        fin: fixTZ(node.newsletter?.fin),\n        enlaces: node.newsletter?.enlace || \"\",\n        imagen: node.featuredImage?.node?.sourceUrl || \"\",\n\n      }\n    });\n  }\n}\n\n// Devolver los items transformados\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        368
+      ],
+      "id": "b4a03c20-9899-4cc0-8ad1-6586f27fc72e",
+      "name": "Banners1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "519ba33e-9da4-4b4f-9c72-cf2338b89043",
+              "leftValue": "={{ $input.all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1792,
+        368
+      ],
+      "id": "d4ec97fa-0b54-442e-8f3b-6ce868b6b419",
+      "name": "ExistenBanners"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      html: `\n<mj-section padding=\"0px\" background-color=\"white\">\n  <mj-column padding=\"10px 0\">\n    <mj-image href=\"${$input.first().json.enlaces}\" src=\"${$input.first().json.imagen}\" fluid-on-mobile=\"true\" title=\"${$input.first().json.titulo}\" padding=\"0px\" />\n  </mj-column>\n</mj-section>\n`\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        272
+      ],
+      "id": "8b9784bc-ebde-4079-810a-ae6c3543d94b",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === ENTRADA ===\n// items = array con objetos como:\n// {\n//   id, titulo, categoria, campus, modalidad,\n//   inicio, fin, enlace, imagen, lugar, organiza{...}\n// }\n\n// === N8N ===\nconst actividades = $input.all().map(x => x.json);\nlet html = \"\";\nlet idx = 0;\n\n// Formatear fecha → día y mes abreviado (como PA)\nfunction obtenerDia(fechaStr) {\n  if (!fechaStr) return \"\";\n  const d = new Date(fechaStr);\n  return d.getDate();\n}\n\nfunction obtenerMes(fechaStr) {\n  if (!fechaStr) return \"\";\n  const meses = [\"ENE\", \"FEB\", \"MAR\", \"ABR\", \"MAY\", \"JUN\", \"JUL\", \"AGO\", \"SEP\", \"OCT\", \"NOV\", \"DIC\"];\n  const d = new Date(fechaStr);\n  return meses[d.getMonth()];\n}\n\nfunction truncarTexto(texto, max) {\n  if (!texto) return \"\";\n  return texto.length <= max ? texto : texto.substring(0, max) + \"...\";\n}\n\nfunction truncarLugar(lugar) {\n  if (!lugar) return \"\";\n  return lugar.length <= 22 ? lugar : lugar.substring(0, 22);\n}\n\nfunction obtenerModalidad(modalidad, lugar, campus) {\n  const m = (modalidad || \"\").toLowerCase();\n  const l = (lugar || \"\").toLowerCase();\n\n  const virtual = m === \"virtual\" || l.includes(\"zoom\");\n\n  return virtual ? `🖥️ Virtual` : `📍 ${campus || \"\"}`;\n}\n\n// --- APERTURA GLOBAL ---\nhtml += `<!-- Actividades -->\n<mj-section background-color=\"white\" padding=\"0px 20px\" full-width=\"full-width\">\n`;\n\nfor (let i = 0; i < actividades.length; i++) {\n  const ev = actividades[i];\n  const isPar = idx % 2 === 0;\n  const esUltimo = idx === actividades.length - 1;\n\n  // EXTRAER CAMPOS\n  const Dia = obtenerDia(ev.inicio);\n  const Mes = obtenerMes(ev.inicio);\n  const Titulo = ev.titulo || \"\";\n  const Categoria = ev.categoria || \"\";\n  const Enlace = ev.enlace || \"\";\n  const Lugar = ev.lugar || \"\";\n  const Campus = ev.campus || \"\";\n  const Modalidad = ev.modalidad || \"\";\n  const Hora = \"\";  // NO VIENE EN TU JSON. Si luego lo agregas, lo ponemos.\n  \n  // ===========================\n  // BLOQUE IZQUIERDA (idx par)\n  // ===========================\n  if (isPar) {\n    html += `\n<mj-group css-class=\"row\" ${esUltimo ? 'width=\"50%\"' : \"\"}>\n  <mj-column width=\"15%\" padding=\"5px\" border=\"solid #00369c 3px\" vertical-align=\"middle\">\n    <mj-text font-size=\"30px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" align=\"center\">\n      ${Dia}\n    </mj-text>\n    <mj-text font-size=\"14px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" text-transform=\"uppercase\" align=\"center\">\n      ${Mes}\n    </mj-text>\n  </mj-column>\n\n  <mj-column width=\"85%\" padding=\"5px 10px\" vertical-align=\"middle\">\n    <mj-text font-size=\"16px\" color=\"black\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"500\">\n      <a href=\"${Enlace}\" title=\"${Titulo}\" style=\"color:black; text-decoration:none;\">\n        <p style=\"margin:0; line-height:1.1rem;\">\n          <b>\n            ${Categoria ? Categoria + \" | \" : \"\"}\n            ${truncarTexto(Titulo, 109)}\n          </b>\n        </p>\n      </a>\n    </mj-text>\n\n    <mj-table align=\"left\" font-size=\"11px\" width=\"100%\" padding=\"5px 0px 0px 0px\" line-height=\"11px\">\n      <tr>\n        <td style=\"text-align:center;\">🕒 ${Hora}</td>\n        <td style=\"text-align:center; border-left:solid 1px gray;border-right:solid 1px gray;\">\n          🏛️ <span title=\"${Lugar}\">${truncarLugar(Lugar)}</span>\n        </td>\n        <td style=\"text-align:center;\">\n          ${obtenerModalidad(Modalidad, Lugar, Campus)}\n        </td>\n      </tr>\n    </mj-table>\n  </mj-column>\n</mj-group>\n`;\n\n    if (esUltimo) {\n      html += `</mj-section><!-- Actividades -->`;\n    }\n\n  } else {\n\n  // ===========================\n  // BLOQUE DERECHA (idx impar)\n  // ===========================\n    html += `\n<mj-group css-class=\"row\">\n  <mj-column width=\"15%\" padding=\"5px\" border=\"solid #00369c 3px\" vertical-align=\"middle\">\n    <mj-text font-size=\"30px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" align=\"center\">\n      ${Dia}\n    </mj-text>\n    <mj-text font-size=\"14px\" color=\"#00369c\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"600\" text-transform=\"uppercase\" align=\"center\">\n      ${Mes}\n    </mj-text>\n  </mj-column>\n\n  <mj-column width=\"85%\" padding=\"5px 10px\" vertical-align=\"middle\">\n    <mj-text font-size=\"16px\" color=\"black\" font-family=\"Baskerville\" padding=\"0px\" font-weight=\"500\">\n      <a href=\"${Enlace}\" title=\"${Titulo}\" style=\"color:black; text-decoration:none;\">\n        <p style=\"margin:0; line-height:1.1rem;\">\n          <b>${truncarTexto(Titulo, 109)}</b>\n        </p>\n      </a>\n    </mj-text>\n\n    <mj-table align=\"left\" font-size=\"11px\" width=\"100%\" padding=\"5px 0px 0px 0px\" line-height=\"11px\">\n      <tr>\n        <td style=\"text-align:center;\">🕒 ${Hora}</td>\n        <td style=\"text-align:center; border-left:solid 1px gray;border-right:solid 1px gray;\">\n          🏛️ <span title=\"${Lugar}\">${truncarLugar(Lugar)}</span>\n        </td>\n        <td style=\"text-align:center;\">\n          ${obtenerModalidad(Modalidad, Lugar, Campus)}\n        </td>\n      </tr>\n    </mj-table>\n  </mj-column>\n</mj-group>\n</mj-section><!-- Actividades -->\n`;\n  }\n\n  idx++;\n}\n\nreturn [\n  {\n    json: {\n      actividades: html.trim()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        176
+      ],
+      "id": "b898957d-f0d9-4516-9f03-51e2ffd04283",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "944d5c4d-fcea-4092-aaea-c70afe3ff294",
+              "name": "Header",
+              "value": "<!--Header --><mj-wrapper full-width=\\\"full-width\\\" padding=\\\"0px\\\" background-color=\\\"#00369c\\\"><mj-section background-color=\\\"#00369c\\\"><mj-column width=\\\"25%\\\" vertical-align=\\\"middle\\\"><mj-image href=\\\"https://pucmm.edu.do\\\" width=\\\"230px\\\" src=\\\"https://pucmm.edu.do/Documents/mail/pucmmw.png\\\" /></mj-column><mj-column width=\\\"75%\\\" vertical-align=\\\"middle\\\"><mj-text align=\\\"center\\\" color=\\\"#fff\\\" font-family=\\\"Baskerville\\\" padding=\\\"0px\\\"><h1 style=\\\"font-size:30px; font-weight:600;line-height: 0.3;\\\">PUCMM Día a Día<h1><p style=\\\"font-size:16px; font-family:sans-serif; font-weight:300; line-height: 0.3;\\\"></p></mj-text></mj-column></mj-section></mj-wrapper><!--Header -->",
+              "type": "string"
+            },
+            {
+              "id": "cd78135f-a4b2-4636-9380-1a85046668ff",
+              "name": "txtComunidad",
+              "value": "<!--Texto--><mj-section background-color=\"white\" border-radius=\"6px 6px 0 0\"><mj-column><mj-text align=\"center\" line-height=\"1.5\" padding-left=\"50px\" padding-right=\"50px\"><h2>[[TITULO]]</h2>[[MENSAJE]] </mj-text> [[DIVISOR]]</mj-column></mj-section>",
+              "type": "string"
+            },
+            {
+              "id": "7db52607-06d7-44c6-a2a5-3fd5e80e0928",
+              "name": "Footer",
+              "value": "<!-- Footer -->\n<mj-wrapper full-width=\"full-width\" padding=\"0px 0px 20px 0px\" background-color=\"#f0f0f0\">\n<mj-section padding=\"0px\"> \n      <mj-column width=\"100%\">\n        <mj-text align=\"center\" line-height=\"1\">\n          <p style=\"font-size:16px;\">Comunicación Interna</p>\n<p style=\"font-size:14px; margin:0px;\">Dirección de Comunicaciones</p>\n<p>Pontificia Universidad Católica Madre y Maestra</p>\n        </mj-text>\n      </mj-column>\n    </mj-section>\n<!-- Social icons -->\n      <mj-section>\n      <mj-group width=\"60%\">\n        <mj-column>\n          <mj-social>\n            <mj-social-element name=\"instagram\" href=\"https://www.instagram.com/pucmm\"></mj-social-element>\n          </mj-social>\n        </mj-column>\n        <mj-column>\n          <mj-social>\n            <mj-social-element name=\"facebook\" href=\"https://www.facebook.com/pucmm/\"></mj-social-element>\n          </mj-social>\n        </mj-column>\n        <mj-column>\n          <mj-social>\n            <mj-social-element name=\"youtube\" href=\"https://www.youtube.com/pucmmtv/\"></mj-social-element>\n          </mj-social>\n        </mj-column>\n        <mj-column>\n          <mj-social>\n            <mj-social-element name=\"x\" href=\"https://twitter.com/pucmm/\"></mj-social-element>\n          </mj-social>\n        </mj-column>\n        <mj-column>\n          <mj-social>\n            <mj-social-element name=\"linkedin\" href=\"https://www.linkedin.com/edu/school?id=12020\"></mj-social-element>\n          </mj-social>\n        </mj-column>\n      </mj-group>  \n      </mj-section>\n    </mj-wrapper>\n<!-- Footer -->",
+              "type": "string"
+            },
+            {
+              "id": "f5250545-edfe-478a-a148-ed08c7a9a6e7",
+              "name": "Boton",
+              "value": "<!-- Boton ir a actividades -->\n<mj-section background-color=\"white\" full-width=\"full-width\" border-radius=\"0 0 6px 6px\"><mj-column><mj-text line-height=\"1.5\" align=\"center\" padding-left=\"50px\" padding-right=\"50px\">[[TEXTO BOTON]]</mj-text><mj-button font-family=\"Helvetica\" background-color=\"#FFE607\" color=\"black\" href=\"https://dia.pucmm.edu.do/\" height=\"60px\" font-weight=\"600\" >Ver todas las actividades</mj-button></mj-column></mj-section>\n<!-- Boton ir a actividades -->",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1984,
+        176
+      ],
+      "id": "9c713839-8156-45de-bcb0-8328bb4090c4",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"title\": \"Familia PUCMM\",\n  \"diario\": {\n    \"subject\": \"Hoy en PUCMM Día a Día\",\n    \"mensaje\": \"Les invitamos a mantenerse al tanto de las actividades y eventos<br/>programados para hoy en nuestra Universidad.\",\n    \"cierre\": \"Aprovechemos juntos estos espacios que fortalecen nuestra formación, comunidad y espíritu universitario.\"\n  },\n  \"semanal\": {\n    \"subject\": \"Esta semana en PUCMM Día a Día\",\n    \"mensaje\": \"Compartimos con ustedes la agenda PUCMM Día a Día con las actividades programadas para la semana del <b>[[CAMPO DINAMICO]],</b> con el fin de mantenernos informados y participar activamente en los diferentes espacios de formación, cultura, espiritualidad y recreación que ofrece nuestra Universidad.\",\n    \"cierre\": \"Les motivamos a integrarse en estas iniciativas que fortalecen nuestro espíritu universitario<br/>y contribuyen a la vivencia de los valores que nos caracterizan.\"\n  },\n  \"mensual\": {\n    \"subject\": \"Este mes en PUCMM Día a Día\",\n    \"mensaje\": \"Compartimos con ustedes la agenda PUCMM Día a Día con las actividades programadas para este mes del <b>[[CAMPO DINAMICO]],</b> con el fin de mantenernos informados y participar activamente en los diferentes espacios de formación, cultura, espiritualidad y recreación que ofrece nuestra Universidad.\",\n    \"cierre\": \"Les motivamos a integrarse en estas iniciativas que fortalecen nuestro espíritu universitario<br/>y contribuyen a la vivencia de los valores que nos caracterizan.\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        176
+      ],
+      "id": "3877382f-7258-4119-8116-3e002d554538",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {
+    "Banners": [
+      {
+        "json": {
+          "id": 6547,
+          "titulo": "Evaluación Profesoral",
+          "inicio": "2025-11-24T00:00:00-04:00",
+          "fin": "2025-11-28T23:59:00-04:00",
+          "enlaces": "https://micampus.pucmm.edu.do/psp/cs92pro/?cmd=login&languageCd=ESP&",
+          "imagen": "https://dia.pucmm.edu.do/wp-content/uploads/2025/11/evalacuacion-prof-2025.png"
+        }
+      }
+    ],
+    "Actividades": [
+      {
+        "json": {
+          "id": 6579,
+          "titulo": "Mercado Laboral 2025",
+          "status": "Programado",
+          "categoria": "Charla",
+          "campus": "CSTI",
+          "modalidad": "Presencial",
+          "inicio": "2025-11-26T00:00:00-04:00",
+          "fin": "2025-11-26T00:00:00-04:00",
+          "enlace": "https://dia.pucmm.edu.do/charla/mercado-laboral-2025/",
+          "imagen": "https://dia.pucmm.edu.do/wp-content/uploads/2023/05/PUCMM-jpg.webp",
+          "lugar": "Auditorio de Ciencias de la Salud",
+          "organiza": {
+            "dept": "Escuela de Ingeniería en Computación y Telecomunicaciones",
+            "nombre": "Nicaudy Peralta Valdez",
+            "tel": "Ext.: 3160",
+            "email": "nicaudyperalta@pucmm.edu.do"
+          }
+        }
+      },
+      {
+        "json": {
+          "id": 6510,
+          "titulo": "Sensibilización en Ordenamiento Territorial",
+          "status": "Programado",
+          "categoria": "Charla",
+          "campus": "CSD",
+          "modalidad": "Presencial",
+          "inicio": "2025-11-26T00:00:00-04:00",
+          "fin": "2025-11-26T00:00:00-04:00",
+          "enlace": "https://dia.pucmm.edu.do/charla/jornada-de-sensibilizacion-en-ordenamiento-territorial/",
+          "imagen": "https://dia.pucmm.edu.do/wp-content/uploads/2023/05/PUCMM-jpg.webp",
+          "lugar": "Aula VPO-03, Postgrado",
+          "organiza": {
+            "dept": "Vicerrectoría Académica",
+            "nombre": "Ivette Collado Vilorio",
+            "tel": "Ext.: 3485",
+            "email": "IvetteCollado@pucmm.edu.do"
+          }
+        }
+      }
+    ]
+  },
+  "repo_name": "n8n",
+  "repo_owner": "alexsamboy",
+  "repo_path": "workflows/pucmm",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-11-25T14:28:01.499Z",
+      "createdAt": "2025-11-25T14:28:01.499Z",
+      "role": "workflow:owner",
+      "workflowId": "yD5Ycriuh8cVFqIT",
+      "projectId": "YN6PBRRUE230hG77"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-26T21:12:39.000Z",
+  "versionId": "2db9f113-2ff3-4d19-9464-b5b6f59a8559"
+}
