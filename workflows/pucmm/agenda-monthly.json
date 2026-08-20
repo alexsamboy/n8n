@@ -1,6 +1,7 @@
 {
   "id": "848f824105bbf077",
   "name": "Agenda PUCMM — monthly",
+  "description": "Programa el boletín mensual de Agenda PUCMM y coordina el envío interno y la campaña de Aliados en Brevo mediante el workflow central.",
   "nodes": [
     {
       "id": "agenda-001",
@@ -110,9 +111,10 @@
     "saveDataSuccessExecution": "none",
     "saveDataErrorExecution": "all",
     "saveManualExecutions": false,
-    "errorWorkflow": "cf9eb8c32404623b"
+    "errorWorkflow": "cf9eb8c32404623b",
+    "availableInMCP": true
   },
-  "versionId": "00000000-0000-4000-8000-000000000005",
+  "versionId": "bbd09adc-44a3-4425-8ffd-b01782b9fcfb",
   "meta": {
     "templateCredsSetupCompleted": false
   },

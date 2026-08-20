@@ -1,6 +1,7 @@
 {
   "id": "d853924eed377ab6",
   "name": "Agenda PUCMM — weekly",
+  "description": "Programa el boletín semanal de Agenda PUCMM, calcula el período correspondiente y delega su construcción y envío al workflow central.",
   "nodes": [
     {
       "id": "agenda-001",
@@ -110,9 +111,10 @@
     "saveDataSuccessExecution": "none",
     "saveDataErrorExecution": "all",
     "saveManualExecutions": false,
-    "errorWorkflow": "cf9eb8c32404623b"
+    "errorWorkflow": "cf9eb8c32404623b",
+    "availableInMCP": true
   },
-  "versionId": "00000000-0000-4000-8000-000000000005",
+  "versionId": "58ebbbb8-2cc6-44c8-9a25-ef011db4f027",
   "meta": {
     "templateCredsSetupCompleted": false
   },

@@ -13,7 +13,7 @@ function card(activity) {
   const date = displayDate(activity.startAt);
   const location = activity.venue || "Por confirmar";
   const mode = activity.modality === "Virtual" ? "🖥️ Virtual" : `📍 ${activity.campus || activity.modality || ""}`;
-  return `<mj-column width="50%" padding="8px"><mj-text css-class="event-title" padding="12px" border="2px solid #00369c"><span style="font-size:24px;color:#00369c;font-weight:bold">${date.day} ${date.month}</span><br/><a href="${escapeHtml(activity.url)}" title="${escapeHtml(activity.title)}" aria-label="${escapeHtml(activity.title)}"><b>${escapeHtml(`${activity.category ? `${activity.category} | ` : ""}${activity.title}`)}</b></a><br/><span style="font-family:Arial,sans-serif;font-size:12px">🕒 ${escapeHtml(displayTime(activity.startAt))} · 🏛️ ${escapeHtml(location)} · ${escapeHtml(mode)}</span></mj-text></mj-column>`;
+  return `<mj-column width="50%" padding="8px"><mj-text css-class="event-card event-title" padding="14px"><span style="font-size:24px;color:#00369c;font-weight:bold">${date.day} ${date.month}</span><br/><a href="${escapeHtml(activity.url)}" title="${escapeHtml(activity.title)}" aria-label="${escapeHtml(activity.title)}"><b>${escapeHtml(`${activity.category ? `${activity.category} | ` : ""}${activity.title}`)}</b></a><br/><span style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5">Hora: ${escapeHtml(displayTime(activity.startAt))}<br/>Lugar: ${escapeHtml(location)} · ${escapeHtml(mode)}</span></mj-text></mj-column>`;
 }
 
 function activityRows(activities) {
@@ -28,10 +28,10 @@ function renderMjml(data, templatePath = path.join(__dirname, "..", "templates",
   const top = data.ads.find((ad) => ad.resolvedPlacement === "top");
   const bottom = data.ads.find((ad) => ad.resolvedPlacement === "bottom");
   const replacements = {
-    SUBJECT: escapeHtml(data.subject), PREVIEW: escapeHtml(data.preview || data.subject),
+    SUBJECT: escapeHtml(data.subject), PREVIEW: escapeHtml(data.preview || `${data.activities.length} actividades en PUCMM Día a Día`),
     TEST_BANNER: data.testMode ? `<mj-section css-class="test-banner"><mj-column><mj-text align="center"><b>[PRUEBA]</b> ${escapeHtml(data.digestType)} · ${escapeHtml(data.windowStart)} → ${escapeHtml(data.windowEndExclusive)}</mj-text></mj-column></mj-section>` : "",
     LOGO_URL: escapeHtml(data.logoUrl), INTRODUCTION: escapeHtml(data.introduction),
-    TOP_AD: adBlock(top), ACTIVITIES: activityRows(data.activities), BOTTOM_AD: adBlock(bottom),
+    TOP_AD: adBlock(top), ACTIVITIES_OR_EMPTY: data.activities.length ? activityRows(data.activities) : `<mj-section background-color="#ffffff" padding="18px 32px"><mj-column><mj-text align="center" color="#4a4a4a">No hay actividades publicadas para este período.</mj-text></mj-column></mj-section>`, BOTTOM_AD: adBlock(bottom),
     CLOSING: escapeHtml(data.closing), AGENDA_URL: escapeHtml(data.agendaUrl), SERVICE_URL: escapeHtml(data.serviceUrl),
   };
   let template = fs.readFileSync(templatePath, "utf8");

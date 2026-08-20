@@ -1,6 +1,7 @@
 {
   "id": "cf9eb8c32404623b",
   "name": "Agenda PUCMM — error-handler",
+  "description": "Recibe errores de los workflows de Agenda PUCMM, normaliza el diagnóstico y envía una notificación sanitizada sin exponer credenciales ni contenido sensible.",
   "nodes": [
     {
       "id": "agenda-001",

@@ -2,19 +2,26 @@
 
 const http = require("node:http");
 const mjml2html = require("mjml");
+const { version: MJML_VERSION } = require("mjml/package.json");
 
 const PORT = 3000;
 const MAX_BODY_BYTES = 2 * 1024 * 1024;
 
-const server = http.createServer((request, response) => {
+function sendJson(response, statusCode, payload) {
+  const body = Buffer.from(JSON.stringify(payload), "utf8");
+  response.statusCode = statusCode;
   response.setHeader("Content-Type", "application/json; charset=utf-8");
+  response.setHeader("Content-Length", body.length);
+  response.end(body);
+}
+
+const server = http.createServer((request, response) => {
   if (request.method === "GET" && request.url === "/healthz") {
-    response.end(JSON.stringify({ status: "ok" }));
+    sendJson(response, 200, { status: "ok", mjmlVersion: MJML_VERSION });
     return;
   }
   if (request.method !== "POST" || request.url !== "/render") {
-    response.statusCode = 404;
-    response.end(JSON.stringify({ error: "not_found" }));
+    sendJson(response, 404, { error: "not_found" });
     return;
   }
 
@@ -31,15 +38,14 @@ const server = http.createServer((request, response) => {
       if (typeof payload.mjml !== "string" || !payload.mjml.trim()) throw new Error("mjml_required");
       const result = await mjml2html(payload.mjml, { validationLevel: "strict", minify: true, keepComments: false });
       if (!result.html?.trim()) throw new Error("empty_html");
-      response.end(JSON.stringify({ html: result.html, errors: result.errors || [] }));
+      sendJson(response, 200, { html: result.html, errors: result.errors || [] });
     } catch (error) {
-      response.statusCode = error.message === "payload_too_large" ? 413 : 422;
-      response.end(JSON.stringify({ error: "render_failed", message: String(error.message).slice(0, 500) }));
+      const details = typeof error.getErrors === "function" ? error.getErrors().map(({ line, message, tagName, formattedMessage }) => ({ line, message, tagName, formattedMessage })) : [];
+      sendJson(response, error.message === "payload_too_large" ? 413 : 422, { error: "render_failed", message: String(error.message).slice(0, 500), details });
     }
   });
   request.on("error", () => {
-    if (!response.headersSent) response.statusCode = 400;
-    if (!response.writableEnded) response.end(JSON.stringify({ error: "invalid_request" }));
+    if (!response.writableEnded) sendJson(response, 400, { error: "invalid_request" });
   });
 });
 

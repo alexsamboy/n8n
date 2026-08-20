@@ -1,6 +1,7 @@
 {
   "id": "8a4db074159975d8",
   "name": "Agenda PUCMM — daily",
+  "description": "Programa el boletín diario de Agenda PUCMM, calcula la ventana del día y delega su construcción y envío al workflow central.",
   "nodes": [
     {
       "id": "agenda-001",
@@ -110,9 +111,11 @@
     "saveDataSuccessExecution": "none",
     "saveDataErrorExecution": "all",
     "saveManualExecutions": false,
-    "errorWorkflow": "cf9eb8c32404623b"
+    "errorWorkflow": "cf9eb8c32404623b",
+    "binaryMode": "separate",
+    "availableInMCP": true
   },
-  "versionId": "00000000-0000-4000-8000-000000000005",
+  "versionId": "1fb229a1-7ff3-4cfd-85b1-5247b5b338c3",
   "meta": {
     "templateCredsSetupCompleted": false
   },
