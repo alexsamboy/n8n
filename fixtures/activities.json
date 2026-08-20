@@ -1,0 +1,24 @@
+[
+  {
+    "databaseId": 101,
+    "title": "Conferencia de innovación &amp; cultura",
+    "link": "https://dia.pucmm.edu.do/actividad/conferencia",
+    "categories": { "nodes": [{ "name": "Académica" }] },
+    "detallesDelEvento": { "detcampus": "Santiago", "modalidad": "Presencial", "status": "Programado" },
+    "horaYFechaDelEvento": { "fechaInicio": "2026-08-20T00:00:00+00:00", "horaDeInicio": "9:00 am", "fechaTermino": "2026-08-20T00:00:00+00:00", "horaTermino": "11:00 am" },
+    "locations": { "nodes": [{ "name": "Auditorio principal" }] },
+    "organizer": { "nodes": [{ "name": "Unidad académica", "organizador": { "nomCsd": "Unidad académica" } }] },
+    "featuredImage": { "node": { "sourceUrl": "https://dia.pucmm.edu.do/media/conferencia.jpg" } }
+  },
+  {
+    "databaseId": 102,
+    "title": "&lt;script&gt;alert('x')&lt;/script&gt; Taller seguro",
+    "link": "https://dia.pucmm.edu.do/actividad/taller",
+    "categories": { "nodes": [{ "name": "Taller" }] },
+    "detallesDelEvento": { "detcampus": null, "modalidad": "Virtual", "status": "Programado" },
+    "horaYFechaDelEvento": { "fechaInicio": "2026-08-20T00:00:00+00:00", "horaDeInicio": "11:30 pm", "fechaTermino": "2026-08-21T00:00:00+00:00", "horaTermino": "1:00 am" },
+    "locations": { "nodes": [{ "name": "Vía Zoom" }] },
+    "organizer": { "nodes": [{ "name": "Equipo de prueba", "organizador": { "nomCsd": "Equipo de prueba" } }] },
+    "featuredImage": { "node": null }
+  }
+]

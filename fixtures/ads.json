@@ -1,0 +1,14 @@
+[
+  {
+    "databaseId": 201,
+    "title": "Programa institucional",
+    "featuredImage": { "node": { "sourceUrl": "https://dia.pucmm.edu.do/media/banner-1.jpg" } },
+    "newsletter": { "enlace": "https://dia.pucmm.edu.do/programa", "inicio": "2026-08-01T00:00:00-04:00", "fin": "2026-08-31T23:59:59-04:00" }
+  },
+  {
+    "databaseId": 202,
+    "title": "Servicios universitarios",
+    "featuredImage": { "node": { "sourceUrl": "https://dia.pucmm.edu.do/media/banner-2.jpg" } },
+    "newsletter": { "enlace": "https://dia.pucmm.edu.do/servicios", "inicio": "2026-08-01T00:00:00-04:00", "fin": "2026-08-31T23:59:59-04:00" }
+  }
+]

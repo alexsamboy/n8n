@@ -1,0 +1,9 @@
+{
+  "name": "pucmm-mjml-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "mjml": "5.4.0"
+  }
+}

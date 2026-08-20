@@ -1,0 +1,184 @@
+{
+  "id": "cf9eb8c32404623b",
+  "name": "Agenda PUCMM — error-handler",
+  "nodes": [
+    {
+      "id": "agenda-001",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "agenda-002",
+      "name": "Sanitizar alerta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const e=$json.execution||{};const w=$json.workflow||{};return [{json:{status:'failed',workflow:w.name||null,executionId:e.id||null,lastNode:e.lastNodeExecuted||null,error:String(e.error?.message||$json.error?.message||'Error').slice(0,500),timestamp:new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "agenda-003",
+      "name": "Configurar alerta",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "alert-1",
+              "name": "alertTo",
+              "value": "manuelperez@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "alert-2",
+              "name": "transport",
+              "value": "smtp",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "agenda-004",
+      "name": "¿Hay destinatario de alerta?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.alertTo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "agenda-007",
+      "name": "Alerta SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        850,
+        0
+      ],
+      "parameters": {
+        "fromEmail": "PUCMM Día a Día <manuelperez@pucmm.edu.do>",
+        "toEmail": "={{ $json.alertTo }}",
+        "subject": "={{ \"[PRUEBA] Error Agenda PUCMM — \" + $json.workflow }}",
+        "emailFormat": "text",
+        "text": "={{ 'Workflow: ' + $json.workflow + '\nNodo: ' + $json.lastNode + '\nError: ' + $json.error + '\nExecution ID: ' + $json.executionId }}",
+        "options": {}
+      },
+      "webhookId": "2d1732c2-ccef-4742-bfd5-d1801b9befa8",
+      "credentials": {
+        "smtp": {
+          "id": "pucmm-agenda-smtp",
+          "name": "PUCMM Agenda SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sanitizar alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitizar alerta": {
+      "main": [
+        [
+          {
+            "node": "Configurar alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configurar alerta": {
+      "main": [
+        [
+          {
+            "node": "¿Hay destinatario de alerta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay destinatario de alerta?": {
+      "main": [
+        [
+          {
+            "node": "Alerta SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": false,
+    "availableInMCP": true
+  },
+  "versionId": "47209c48-6b84-4b66-8d31-4abd80b34269",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [
+    {
+      "id": "agenda-pucmm",
+      "name": "Agenda PUCMM"
+    }
+  ]
+}
