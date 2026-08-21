@@ -6,17 +6,22 @@ y envía un boletín mensual, semanal o diario según la fecha. El correo
 institucional sale por SMTP; el boletín mensual genera además una campaña en
 Brevo.
 
-Los cinco workflows ya están importados en n8n, pero permanecen **inactivos**.
-No se realizó ningún envío.
+Los coordinadores y el orquestador permanecen **inactivos**. Las dos
+bibliotecas están publicadas porque n8n lo exige para ejecutar subworkflows,
+pero no tienen disparadores autónomos y no realizan envíos por sí solas.
 
 ## Arquitectura
 
 - `agenda-monthly.json`: primer lunes del mes; mes calendario completo.
 - `agenda-weekly.json`: demás lunes; lunes a lunes siguiente.
 - `agenda-daily.json`: martes a sábado; día calendario completo.
-- `agenda-build-send.json`: consulta, validación, publicidad, MJML, correo e
-  idempotencia.
+- `agenda-build-send.json`: consulta, validación, publicidad y orquestación de
+  los canales de salida.
 - `agenda-error-handler.json`: alerta operativa sanitizada.
+- `lib-compile-mjml.json`: subworkflow reutilizable que valida el contrato v1,
+  compila MJML y devuelve el HTML junto con métricas y contexto.
+- `lib-brevo-campaign.json`: subworkflow reutilizable que valida destinatarios,
+  aplica idempotencia, crea y programa campañas con la credencial `Brevo`.
 - `tools/mjml-service`: compilador local fijado a MJML 5.4.0.
 
 Los coordinadores comparten una decisión exclusiva. El domingo no produce
@@ -42,8 +47,9 @@ La tabla operativa se llama `Agenda PUCMM — envíos` y su ID es
 | `activity_count` | Number |
 | `ad_count` | Number |
 
-La comprobación ocurre antes de enviar y el registro se inserta únicamente
-después de que el proveedor confirme. Para una repetición controlada, cambie
+La comprobación ocurre antes de enviar. SMTP se registra como `sent` después
+de la aceptación del servidor y Brevo como `scheduled` después de que la API
+confirma la programación. Para una repetición controlada, cambie
 temporalmente `forceResend` a `true` en `Configuración segura` y vuelva a
 `false` inmediatamente.
 
@@ -111,9 +117,11 @@ lista `errors`; un HTML vacío hace fallar el workflow.
 
 Los archivos son importables desde la interfaz o, dentro del contenedor, con
 `n8n import:workflow --input=/ruta/archivo.json`. Importe primero el manejador
-de errores, después `build-send` y finalmente los tres coordinadores. Seleccione
-la credencial de correo después de importar. El ID estable de `build-send` es
-`81aa01934460cec1`.
+de errores; después las bibliotecas MJML y Brevo; luego `build-send`; y al final
+los tres coordinadores. Asigne la credencial `Brevo` dentro de su biblioteca y
+la credencial SMTP dentro de `build-send`. Los IDs usados por el orquestador son
+`73pz6aMDSOoMOrBr` para MJML, `SklCy2UMq5G0elbg` para Brevo y
+`81aa01934460cec1` para `build-send`.
 
 ## Operación y rollback
 

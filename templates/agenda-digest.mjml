@@ -2,30 +2,65 @@
   <mj-head>
     <mj-title>{{SUBJECT}}</mj-title>
     <mj-preview>{{PREVIEW}}</mj-preview>
-    <mj-breakpoint width="480px" />
-    <mj-attributes>
-      <mj-all font-family="Georgia, 'Times New Roman', serif" />
-      <mj-text color="#161616" font-size="15px" line-height="1.55" />
-      <mj-button border-radius="4px" font-family="Arial, Helvetica, sans-serif" font-size="15px" font-weight="700" inner-padding="12px 22px" />
-    </mj-attributes>
+    <mj-breakpoint width="575px" />
+    <mj-font name="Baskerville" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap" />
     <mj-style inline="inline">
-      .event-title a { color:#161616 !important; text-decoration:none !important; }
-      .event-card { border:2px solid #00369c; }
-      .test-banner { background:#fff4b8; }
-      .test-banner div { color:#5b4700 !important; font-family:Arial,Helvetica,sans-serif !important; }
+      .row { padding: 10px 0; }
+      .event-title a { color: #000000 !important; text-decoration: none !important; }
+      .test-banner { background: #fff4b8; }
+      .test-banner div { color: #5b4700 !important; font-family: Arial, Helvetica, sans-serif !important; }
     </mj-style>
   </mj-head>
-  <mj-body background-color="#f0f0f0" width="640px">
+  <mj-body width="800px" background-color="#f0f0f0">
     {{TEST_BANNER}}
-    <mj-section background-color="#00369c" padding="18px 24px">
-      <mj-column width="28%"><mj-image href="https://pucmm.edu.do/" src="{{LOGO_URL}}" alt="PUCMM" width="150px" /></mj-column>
-      <mj-column width="72%"><mj-text align="center" color="#ffffff" font-size="28px" font-weight="700">PUCMM Día a Día</mj-text></mj-column>
-    </mj-section>
-    <mj-section background-color="#ffffff" padding="26px 32px 14px"><mj-column><mj-text align="center" font-size="22px" font-weight="700">Familia PUCMM</mj-text><mj-text align="center">{{INTRODUCTION}}</mj-text><mj-divider border-color="#00369c" border-width="2px" /></mj-column></mj-section>
-    {{TOP_AD}}
-    {{ACTIVITIES_OR_EMPTY}}
-    {{BOTTOM_AD}}
-    <mj-section background-color="#ffffff" padding="18px 32px"><mj-column><mj-text align="center">{{CLOSING}}</mj-text><mj-button background-color="#FFE607" color="#111111" href="{{AGENDA_URL}}" title="Ver todas las actividades de PUCMM">Ver todas las actividades</mj-button><mj-button background-color="#742774" color="#ffffff" href="{{SERVICE_URL}}" title="Abrir la solicitud de servicios">Solicitud de Servicios</mj-button></mj-column></mj-section>
-    <mj-section background-color="#f0f0f0" padding="18px 24px"><mj-column><mj-text align="center" font-family="Arial,Helvetica,sans-serif" font-size="13px">Comunicación Interna<br/>Dirección de Comunicaciones<br/>Pontificia Universidad Católica Madre y Maestra</mj-text><mj-social align="center" icon-size="24px"><mj-social-element name="instagram" href="https://www.instagram.com/pucmm"/><mj-social-element name="facebook" href="https://www.facebook.com/pucmm/"/><mj-social-element name="youtube" href="https://www.youtube.com/pucmmtv/"/><mj-social-element name="linkedin" href="https://www.linkedin.com/edu/school?id=12020"/></mj-social></mj-column></mj-section>
+    <mj-wrapper full-width="full-width" padding="0px" background-color="#00369c">
+      <mj-section background-color="#00369c">
+        <mj-column width="30%" vertical-align="middle">
+          <mj-image href="https://pucmm.edu.do" width="230px" src="{{LOGO_URL}}" alt="Pontificia Universidad Católica Madre y Maestra" />
+        </mj-column>
+        <mj-column width="70%" vertical-align="middle">
+          <mj-text align="center" color="#ffffff" font-family="Baskerville" padding="0px"><h1 style="font-size:30px;font-weight:600;line-height:1;">PUCMM Día a Día</h1></mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper full-width="full-width" padding="20px">
+      <mj-section background-color="#ffffff" border-radius="6px 6px 0 0" padding-bottom="5px">
+        <mj-column><mj-text align="center" line-height="1.5"><h2>Familia PUCMM,</h2>{{INTRODUCTION}}</mj-text></mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff" padding="0 0 20px 0">
+        <mj-column><mj-divider border-width="1px" border-style="solid" border-color="lightgrey" /></mj-column>
+      </mj-section>
+      {{TOP_AD}}
+      {{ACTIVITIES_OR_EMPTY}}
+      {{BOTTOM_AD}}
+      <mj-section background-color="#ffffff" full-width="full-width">
+        <mj-column>
+          <mj-text line-height="1.5" align="center">{{CLOSING}}</mj-text>
+          <mj-button font-family="Helvetica" background-color="#FFE607" color="#000000" href="{{AGENDA_URL}}" height="60px" font-weight="600" title="Ver todas las actividades de PUCMM">Ver todas las actividades</mj-button>
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#f7f7f7" full-width="full-width" border-radius="0 0 6px 6px">
+        <mj-column width="60%">
+          <mj-text line-height="1.5">Haz visibles tus actividades en <b>PUCMM Día a Día</b> completando el Formulario de <b>Solicitud de Servicios</b> de la Dirección de Comunicaciones.</mj-text>
+        </mj-column>
+        <mj-column width="40%">
+          <mj-button font-family="Helvetica" background-color="#742774" color="#ffffff" href="{{SERVICE_URL}}" height="60px" font-weight="600" title="Formulario de Solicitud de Servicios" border-radius="60px">Solicitud de Servicios</mj-button>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper full-width="full-width" padding="0px 0px 20px 0px" background-color="#f0f0f0">
+      <mj-section padding="0px">
+        <mj-column width="100%"><mj-text align="center" line-height="1"><p style="font-size:16px;">Unidad Comunicación Interna</p><p style="font-size:14px;margin:0px;">Dirección de Comunicaciones</p><p>Pontificia Universidad Católica Madre y Maestra</p></mj-text></mj-column>
+      </mj-section>
+      <mj-section padding="0px">
+        <mj-group width="60%">
+          <mj-column><mj-social><mj-social-element name="instagram" href="https://www.instagram.com/pucmm" /></mj-social></mj-column>
+          <mj-column><mj-social><mj-social-element name="facebook" href="https://www.facebook.com/pucmm/" /></mj-social></mj-column>
+          <mj-column><mj-social><mj-social-element name="youtube" href="https://www.youtube.com/pucmmtv/" /></mj-social></mj-column>
+          <mj-column><mj-social><mj-social-element name="x" href="https://twitter.com/pucmm/" /></mj-social></mj-column>
+          <mj-column><mj-social><mj-social-element name="linkedin" href="https://www.linkedin.com/edu/school?id=12020" /></mj-social></mj-column>
+        </mj-group>
+      </mj-section>
+    </mj-wrapper>
   </mj-body>
 </mjml>
