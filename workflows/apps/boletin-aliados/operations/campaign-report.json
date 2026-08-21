@@ -1,0 +1,106 @@
+{
+  "id": "2a48cc4ecd8d5c61",
+  "name": "OPS — Prensa PUCMM — Reporte mensual Brevo",
+  "description": "Consulta estado y métricas agregadas del boletín mensual Brevo sin registrar PII.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "6f24fbb59367a40b",
+      "name": "Entrada reporte Brevo",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -300,
+        0
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "campaignId",
+              "type": "number"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "d29756d34f6b200e",
+      "name": "Consultar reporte Brevo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://api.brevo.com/v3/emailCampaigns/'+$('Entrada reporte Brevo').first().json.campaignId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      }
+    },
+    {
+      "id": "02a8932d95a43778",
+      "name": "Resultado reporte agregado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const x=$json;return [{json:{status:x.status||null,campaignId:x.id||null,statistics:x.statistics?{delivered:x.statistics.delivered||0,uniqueViews:x.statistics.uniqueViews||0,uniqueClicks:x.statistics.uniqueClicks||0}:null}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Entrada reporte Brevo": {
+      "main": [
+        [
+          {
+            "node": "Consultar reporte Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar reporte Brevo": {
+      "main": [
+        [
+          {
+            "node": "Resultado reporte agregado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "availableInMCP": true
+  },
+  "tags": [
+    {
+      "id": "0ZpdqW5xIOojk8Ov",
+      "name": "tipo:operaciones"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    }
+  ]
+}

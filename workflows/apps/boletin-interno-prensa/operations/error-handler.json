@@ -1,0 +1,69 @@
+{
+  "id": "bbb56f7efb469be8",
+  "name": "OPS — Prensa PUCMM — Manejo de errores",
+  "description": "Normaliza errores de Prensa sin secretos, destinatarios ni HTML; la alerta SMTP se habilita tras configurar el correo operativo.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "50bbbfb467476d26",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "a71c6392667541fa",
+      "name": "Sanitizar error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const e=$json.execution||{};return [{json:{status:'failed',workflow:$json.workflow?.name||null,executionId:e.id||null,lastNode:e.lastNodeExecuted||null,error:String(e.error?.message||'Error').slice(0,500),timestamp:new Date().toISOString()}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sanitizar error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "availableInMCP": true
+  },
+  "versionId": "00000000-0000-4000-8000-000000000004",
+  "tags": [
+    {
+      "id": "0ZpdqW5xIOojk8Ov",
+      "name": "tipo:operaciones"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    }
+  ]
+}

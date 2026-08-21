@@ -1,0 +1,757 @@
+{
+  "id": "5b4f57be265e3f80",
+  "name": "ORCH — Prensa PUCMM — Construir y enviar mensual Brevo",
+  "description": "Construye el boletín mensual del mes anterior con orden Rectoría/Portal/resto y coordina Brevo en modo prueba/aprobación.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "90563529c14c5159",
+      "name": "Entrada mensual Aliados",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1100,
+        0
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "referenceNow"
+            },
+            {
+              "name": "dryRun",
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5a1d8f7e8f98841d",
+      "name": "Configuración Aliados",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -900,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "testMode",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "a2",
+              "name": "dryRun",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "a3",
+              "name": "requireApproval",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "a4",
+              "name": "autoSend",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "a5",
+              "name": "pressGraphqlUrl",
+              "value": "https://prensa.pucmm.edu.do/graphql",
+              "type": "string"
+            },
+            {
+              "id": "a6",
+              "name": "wpPageSize",
+              "value": 50,
+              "type": "number"
+            },
+            {
+              "id": "a7",
+              "name": "wpMaxPages",
+              "value": 100,
+              "type": "number"
+            },
+            {
+              "id": "a8",
+              "name": "excerptMaxChars",
+              "value": 320,
+              "type": "number"
+            },
+            {
+              "id": "a9",
+              "name": "logoUrl",
+              "value": "https://pucmm.edu.do/wp-content/uploads/2026/07/pucmm-logo.svg",
+              "type": "string"
+            },
+            {
+              "id": "a10",
+              "name": "pressUrl",
+              "value": "https://prensa.pucmm.edu.do/noticias/",
+              "type": "string"
+            },
+            {
+              "id": "a11",
+              "name": "emailTestEmails",
+              "value": "manuelperez@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "a12",
+              "name": "recipientType",
+              "value": "list",
+              "type": "string"
+            },
+            {
+              "id": "a13",
+              "name": "recipientId",
+              "value": "116",
+              "type": "string"
+            },
+            {
+              "id": "a14",
+              "name": "productionRecipientIds",
+              "value": "2,4,146,160,164,165,170,189,190",
+              "type": "string"
+            },
+            {
+              "id": "a15",
+              "name": "senderId",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "a16",
+              "name": "replyTo",
+              "value": "info@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "a17",
+              "name": "dataTableId",
+              "value": "nRoI0Ta5SQizvi0U",
+              "type": "string"
+            },
+            {
+              "id": "a18",
+              "name": "brevoApiUrl",
+              "value": "https://api.brevo.com/v3",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "0e2a1438a7325022",
+      "name": "Preparar consulta mensual",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const c=$json;const local=s=>{const d=new Date(s),p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Santo_Domingo',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d).map(x=>[x.type,x.value]));return {year:+p.year,month:+p.month,day:+p.day}};const query='query PressMonthly($first:Int!,$cursor:String,$after:DateInput,$before:DateInput){posts(first:$first,after:$cursor,where:{dateQuery:{after:$after,before:$before,inclusive:true}}){nodes{databaseId title date link content featuredImage{node{sourceUrl altText}} categories{nodes{databaseId name slug}} opcionesPublicacion{portalPucmm campus dependencia{nodes{databaseId name slug}}}} pageInfo{hasNextPage endCursor}}}';return [{json:{...c,pressBody:{query,variables:{first:c.wpPageSize,cursor:null,after:local(c.windowStart),before:local(c.windowEndExclusive)}}}}];"
+      }
+    },
+    {
+      "id": "673bdd124143f848",
+      "name": "Consultar Prensa mensual",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -500,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración Aliados').first().json.pressGraphqlUrl }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.pressBody }}",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "body",
+                    "name": "variables.cursor",
+                    "value": "={{ $response.body.data.posts.pageInfo.endCursor }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.data.posts.pageInfo.hasNextPage }}",
+              "limitPagesFetched": true,
+              "maxRequests": 100,
+              "requestInterval": 250
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "GbAhTYn0osJtfFWq",
+          "name": "Prensa PUCMM Wordpress API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "6d361514d86edafb",
+      "name": "Normalizar y construir campaña",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const c={...$('Configuración Aliados').first().json,...$('Calcular mes anterior').first().json,...$json};\nconst pages=$('Consultar Prensa mensual').all().flatMap(i=>Array.isArray(i.json)?i.json:[i.json]);\nif(pages.some(x=>x.errors?.length)) throw new Error('GraphQL errors[]');\nconst clean=v=>String(v??'').replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,' ').replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&amp;/gi,'&').replace(/&nbsp;/gi,' ').replace(/\\s+/g,' ').trim();\nconst safe=v=>{const s=String(v||'').trim();return /^https:\\/\\/[^\\s<>\\x22\\x27]+$/i.test(s)?s:null};\nconst esc=v=>String(v??'').replace(/[&<>\"']/g,z=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[z]));\nconst start=new Date(c.windowStart),end=new Date(c.windowEndExclusive),map=new Map(),invalid=[];\nfor(const x of pages.flatMap(x=>x.data?.posts?.nodes||[])){\n  const d=new Date(String(x.date||'')+'-04:00');\n  const categories=(x.categories?.nodes||[]).map(y=>({id:String(y.databaseId||''),name:clean(y.name),slug:clean(y.slug)})).filter(y=>y.name);\n  const department=clean(x.opcionesPublicacion?.dependencia?.nodes?.[0]?.name)||null;\n  const normalizedDepartment=department?.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();\n  const portalPucmm=Boolean(x.opcionesPublicacion?.portalPucmm);\n  const a={id:String(x.databaseId||''),title:clean(x.title),publishedAt:Number.isNaN(d.valueOf())?null:d.toISOString(),url:safe(x.link),excerptText:clean(x.content).slice(0,c.excerptMaxChars),imageUrl:safe(x.featuredImage?.node?.sourceUrl),imageAlt:clean(x.featuredImage?.node?.altText)||clean(x.title),categories,campus:clean(x.opcionesPublicacion?.campus)||null,department,portalPucmm,segment:normalizedDepartment==='rectoria'?0:portalPucmm?1:2};\n  if(!a.id||!a.title||!a.url||Number.isNaN(d.valueOf())||d<start||d>=end){invalid.push(a.id);continue}\n  if(!map.has(a.id)) map.set(a.id,a);\n}\nconst articles=[...map.values()].sort((a,b)=>(a.segment??2)-(b.segment??2)||new Date(b.publishedAt)-new Date(a.publishedAt)||a.id.localeCompare(b.id));\nconst month=new Intl.DateTimeFormat('es-DO',{timeZone:'America/Santo_Domingo',month:'long'}).format(start);\nconst year=new Intl.DateTimeFormat('es-DO',{timeZone:'America/Santo_Domingo',year:'numeric'}).format(start);\nconst cards=articles.map(a=>'<mj-section background-color=\"#ffffff\" padding=\"18px 28px\"><mj-column>'+(a.imageUrl?'<mj-image href=\"'+esc(a.url)+'\" src=\"'+esc(a.imageUrl)+'\" alt=\"'+esc(a.imageAlt)+'\"/>':'')+'<mj-text font-size=\"12px\" color=\"#666\">'+esc((a.categories[0]?.name||'')+' · '+new Intl.DateTimeFormat('es-DO',{timeZone:'America/Santo_Domingo',dateStyle:'long'}).format(new Date(a.publishedAt)))+'</mj-text><mj-text font-size=\"21px\" font-family=\"Libre Baskerville,Georgia,serif\"><a href=\"'+esc(a.url)+'\" style=\"color:#111;text-decoration:none\"><b>'+esc(a.title)+'</b></a></mj-text><mj-text>'+esc(a.excerptText)+'</mj-text><mj-divider border-color=\"#ddd\"/></mj-column></mj-section>').join('');\nconst key=require('crypto').createHash('sha256').update('allies-monthly|'+c.monthKey+'|'+c.recipientType+'|'+c.recipientId).digest('hex');\nconst subject=(c.testMode?'[PRUEBA] ':'')+'Noticias PUCMM · '+month+' de '+year;\nconst mjml='<mjml><mj-head><mj-title>'+esc(subject)+'</mj-title><mj-preview>'+articles.length+' noticias de Prensa PUCMM</mj-preview><mj-breakpoint width=\"575px\"/><mj-font name=\"Libre Baskerville\" href=\"https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&amp;display=swap\"/></mj-head><mj-body width=\"800px\" background-color=\"#f1f1f1\"><mj-section background-color=\"#00369c\"><mj-column width=\"30%\"><mj-image src=\"'+esc(c.logoUrl)+'\" alt=\"PUCMM\"/></mj-column><mj-column width=\"70%\"><mj-text align=\"center\" color=\"#fff\"><h1>Prensa PUCMM</h1><p>Boletín para Aliados · Dirección de Comunicaciones</p></mj-text></mj-column></mj-section><mj-section background-color=\"#fff\"><mj-column><mj-text align=\"center\"><h2>Noticias PUCMM</h2>Compartimos las noticias publicadas durante '+month+' de '+year+'.</mj-text><mj-divider border-color=\"#F4D500\" border-width=\"3px\"/></mj-column></mj-section>'+cards+'<mj-section background-color=\"#fff\"><mj-column><mj-button background-color=\"#F4D500\" href=\"'+esc(c.pressUrl)+'\">Ver todas las noticias</mj-button></mj-column></mj-section></mj-body></mjml>';\nreturn [{json:{...c,articles,articleCount:articles.length,adCount:0,invalidCount:invalid.length,executionKey:key,subject,mjml,shouldProcess:articles.length>0,startedAt:new Date().toISOString()}}];\n"
+      }
+    },
+    {
+      "id": "7e1824225d3888b1",
+      "name": "¿Hay noticias mensuales?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        100,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.shouldProcess }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e02c5362685bd720",
+      "name": "Compilar MJML reutilizable",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        300,
+        -80
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "73pz6aMDSOoMOrBr"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contractVersion": 1,
+            "mjml": "={{ $json.mjml }}",
+            "correlationId": "={{ $json.executionKey }}",
+            "context": "={{ $json }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "2feca8f6056d579b",
+      "name": "¿Es dry-run mensual?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        500,
+        -80
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.dryRun }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b3c8e1f974c8f93e",
+      "name": "Resultado mensual dry-run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        -160
+      ],
+      "parameters": {
+        "jsCode": "const c=$json;return [{json:{status:'dry_run',windowStart:c.windowStart,windowEndExclusive:c.windowEndExclusive,articleCount:c.articleCount,executionKey:c.executionKey,htmlBytes:String(c.html||'').length,mjmlBytes:String(c.mjml||'').length}}];"
+      }
+    },
+    {
+      "id": "97b35a63df2c1cb5",
+      "name": "Calcular mes anterior",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const n=new Date($json.referenceNow||new Date().toISOString());const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Santo_Domingo',year:'numeric',month:'numeric'}).formatToParts(n).map(x=>[x.type,x.value]));const y=+p.year,m=+p.month;return [{json:{...$json,referenceNow:n.toISOString(),windowStart:new Date(Date.UTC(y,m-2,1,4)).toISOString(),windowEndExclusive:new Date(Date.UTC(y,m-1,1,4)).toISOString(),monthKey:String(y)+'-'+String(m-1).padStart(2,'0')}}];"
+      }
+    },
+    {
+      "id": "3b361f1e83f61b85",
+      "name": "Crear borrador Brevo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        20
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración Aliados').first().json.brevoApiUrl }}/emailCampaigns",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({name:'Boletín Aliados · '+$('Calcular mes anterior').first().json.monthKey,tag:'Boletin Aliados '+$('Calcular mes anterior').first().json.monthKey,subject:$json.subject,sender:{id:$('Configuración Aliados').first().json.senderId},replyTo:$('Configuración Aliados').first().json.replyTo,recipients:{listIds:($('Configuración Aliados').first().json.testMode?[116]:$('Configuración Aliados').first().json.productionRecipientIds.split(',').map(Number))},htmlContent:$json.html}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      }
+    },
+    {
+      "id": "fb87dd9307cc4058",
+      "name": "Conservar campaignId Brevo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        20
+      ],
+      "parameters": {
+        "jsCode": "const source=$('Compilar MJML reutilizable').first().json;const campaignId=Number($json.id);if(!Number.isInteger(campaignId)||campaignId<1)throw new Error('Brevo no devolvió campaignId');return [{json:{...source,campaignId}}];"
+      }
+    },
+    {
+      "id": "5b4473db9fc4e20a",
+      "name": "¿Enviar prueba Brevo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1340,
+        20
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.testMode }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e84b93c36990dbe9",
+      "name": "Enviar sendTest Brevo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1560,
+        -80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración Aliados').first().json.brevoApiUrl }}/emailCampaigns/{{ $json.campaignId }}/sendTest",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({emailTo:$('Configuración Aliados').first().json.emailTestEmails.split(',').map(x=>x.trim()).filter(Boolean)}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      }
+    },
+    {
+      "id": "419e231f8ffb10db",
+      "name": "¿Requiere aprobación?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        140
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Configuración Aliados').first().json.requireApproval }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c1d4e52f5c9accfb",
+      "name": "Enviar campaña aprobada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1780,
+        220
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración Aliados').first().json.brevoApiUrl }}/emailCampaigns/{{ $json.campaignId }}/sendNow",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      }
+    },
+    {
+      "id": "678a3bc151f009e3",
+      "name": "Resultado campaña Aliados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        20
+      ],
+      "parameters": {
+        "jsCode": "const c=$('Conservar campaignId Brevo').first().json;const cfg=$('Configuración Aliados').first().json;return [{json:{status:cfg.testMode?'test_sent':(cfg.requireApproval?'awaiting_approval':'sent'),campaignId:c.campaignId,executionKey:c.executionKey,articleCount:c.articleCount}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Entrada mensual Aliados": {
+      "main": [
+        [
+          {
+            "node": "Configuración Aliados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración Aliados": {
+      "main": [
+        [
+          {
+            "node": "Calcular mes anterior",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular mes anterior": {
+      "main": [
+        [
+          {
+            "node": "Preparar consulta mensual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar consulta mensual": {
+      "main": [
+        [
+          {
+            "node": "Consultar Prensa mensual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Prensa mensual": {
+      "main": [
+        [
+          {
+            "node": "Normalizar y construir campaña",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar y construir campaña": {
+      "main": [
+        [
+          {
+            "node": "¿Hay noticias mensuales?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay noticias mensuales?": {
+      "main": [
+        [
+          {
+            "node": "Compilar MJML reutilizable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Compilar MJML reutilizable": {
+      "main": [
+        [
+          {
+            "node": "¿Es dry-run mensual?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es dry-run mensual?": {
+      "main": [
+        [
+          {
+            "node": "Resultado mensual dry-run",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear borrador Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear borrador Brevo": {
+      "main": [
+        [
+          {
+            "node": "Conservar campaignId Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conservar campaignId Brevo": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar prueba Brevo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar prueba Brevo?": {
+      "main": [
+        [
+          {
+            "node": "Enviar sendTest Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "¿Requiere aprobación?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Requiere aprobación?": {
+      "main": [
+        [
+          {
+            "node": "Resultado campaña Aliados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar campaña aprobada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar campaña aprobada": {
+      "main": [
+        [
+          {
+            "node": "Resultado campaña Aliados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar sendTest Brevo": {
+      "main": [
+        [
+          {
+            "node": "Resultado campaña Aliados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "availableInMCP": true,
+    "errorWorkflow": "451883ca9fa2257d"
+  },
+  "versionId": "00000000-0000-4000-8000-000000000002",
+  "tags": [
+    {
+      "id": "E5zpZbg1ZklwhBHC",
+      "name": "tipo:orquestador"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    },
+    {
+      "id": "vWtTfSH6USLlhmO4",
+      "name": "formato:mjml"
+    }
+  ]
+}

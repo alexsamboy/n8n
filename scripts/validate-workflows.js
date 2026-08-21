@@ -13,6 +13,14 @@ const expected = [
   "libraries/messaging/compile-mjml.json",
   "libraries/messaging/brevo-campaign.json",
   "libraries/messaging/send-smtp.json",
+  "apps/boletin-interno-prensa/coordination/scheduler.json",
+  "apps/boletin-interno-prensa/coordination/monthly.json",
+  "apps/boletin-interno-prensa/orchestration/build-send.json",
+  "apps/boletin-interno-prensa/operations/error-handler.json",
+  "apps/boletin-aliados/coordinators/monthly.json",
+  "apps/boletin-aliados/orchestration/build-send-campaign.json",
+  "apps/boletin-aliados/operations/error-handler.json",
+  "apps/boletin-aliados/operations/campaign-report.json",
 ];
 let failed = false;
 for (const file of expected) {

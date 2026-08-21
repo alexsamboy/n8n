@@ -1,0 +1,12 @@
+{
+  "articles": [
+    {"databaseId":1,"title":"Noticia &amp; Rectoría","date":"2026-08-21T09:00:00-04:00","link":"https://prensa.pucmm.edu.do/noticia-1/","content":"<p>Resumen institucional.</p>","opcionesPublicacion":{"portalPucmm":false,"campus":"CSTI","dependencia":{"nodes":[{"databaseId":9,"name":"Rectoría","slug":"rectoria"}]}}},
+    {"databaseId":2,"title":"Noticia sin imagen","date":"2026-08-21T08:00:00-04:00","link":"https://prensa.pucmm.edu.do/noticia-2/","content":"<div>Contenido <b>válido</b>.</div>","opcionesPublicacion":{"portalPucmm":true,"campus":"CSD","dependencia":{"nodes":[]}}},
+    {"databaseId":3,"title":"Noticia con <script>alert(1)</script> texto","date":"2026-08-20T16:00:00-04:00","link":"https://prensa.pucmm.edu.do/noticia-3/","content":"HTML irregular &amp; seguro","opcionesPublicacion":{"portalPucmm":false,"dependencia":{"nodes":[]}}}
+  ],
+  "banners": [
+    {"databaseId":1,"title":"Banner uno","newsletter":{"inicio":"2026-08-01T00:00:00Z","fin":"2026-09-01T00:00:00Z","enlace":"https://pucmm.edu.do/"},"featuredImage":{"node":{"sourceUrl":"https://dia.pucmm.edu.do/banner-1.png","altText":"Banner uno"}}},
+    {"databaseId":2,"title":"Banner dos","newsletter":{"inicio":"2026-08-10T00:00:00Z","fin":"2026-09-01T00:00:00Z","enlace":"https://prensa.pucmm.edu.do/"},"featuredImage":{"node":{"sourceUrl":"https://dia.pucmm.edu.do/banner-2.png","altText":"Banner dos"}}},
+    {"databaseId":3,"title":"Banner rechazado","newsletter":{"inicio":"2026-08-10T00:00:00Z","fin":"2026-09-01T00:00:00Z","enlace":"#"},"featuredImage":{"node":{"sourceUrl":"https://dia.pucmm.edu.do/banner-3.png"}}}
+  ]
+}

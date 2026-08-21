@@ -1,10 +1,14 @@
-# Agenda PUCMM Día a Día en n8n
+# Automatizaciones PUCMM en n8n
 
 Implementación para n8n `2.35.5` que obtiene actividades y banners desde
 WPGraphQL, normaliza fechas en `America/Santo_Domingo`, compila MJML localmente
 y envía un boletín mensual, semanal o diario según la fecha. El correo
 institucional sale por SMTP; el boletín mensual genera además una campaña en
 Brevo.
+
+El repositorio también contiene la migración segura de **Boletín Interno
+Prensa**, que consulta `prensa.pucmm.edu.do`, reutiliza las bibliotecas MJML,
+SMTP y Brevo, y conserva sus coordinadores inactivos hasta su aprobación.
 
 Los coordinadores y el orquestador permanecen **inactivos** en los archivos
 importables. Las tres
@@ -27,6 +31,13 @@ pero no tienen disparadores autónomos y no realizan envíos por sí solas.
   envío con `PUCMM Agenda SMTP` y auditoría.
 - `workflows/archive/agenda-pucmm/`: versiones históricas inactivas que no
   deben importarse como producción.
+- `workflows/apps/boletin-interno-prensa/`: coordinadores diario y mensual,
+  un único orquestador compartido y manejador de errores del boletín de
+  noticias. El coordinador diario selecciona SMTP y el mensual selecciona
+  Brevo mediante `emailTransport`, sin duplicar la lógica de consulta/MJML.
+- `workflows/apps/boletin-aliados/`: artefactos históricos inactivos; el
+  coordinador y constructor mensual anteriores fueron archivados en n8n y no
+  deben importarse ni activarse.
 - `tools/mjml-service`: compilador local fijado a MJML 5.4.0.
 
 Los coordinadores comparten una decisión exclusiva. El domingo no produce
@@ -161,3 +172,58 @@ de su biblioteca. Los IDs usados por el orquestador son
 El descubrimiento verificable de campos está en
 [docs/wordpress-source-audit.md](docs/wordpress-source-audit.md). El estado de
 seguridad está en [security_best_practices_report.md](security_best_practices_report.md).
+
+## Boletín Interno Prensa
+
+Los coordinadores `APP — Prensa PUCMM — Boletín interno`
+(`f54704c5e44f602a`) y `APP — Prensa PUCMM — Boletín mensual`
+(`e1a71f7ed90c4ef4`) llaman al único orquestador
+`ORCH — Prensa PUCMM — Construir y enviar` (`654286fe97f96096`). El diario
+calcula una ventana semiabierta desde el último envío confirmado; el mensual
+calcula el mes calendario anterior. Las pruebas manuales inyectan `testMode`
+con una ventana histórica, igual que Agenda; no existe una rama `dryRun`.
+
+Dependencias:
+
+- `Prensa PUCMM Wordpress API`, ya configurada en n8n.
+- `PUCMM WordPress API` para banners de Agenda.
+- Data Table `Boletín Interno Prensa — estado` (`nRoI0Ta5SQizvi0U`).
+- Bibliotecas MJML `73pz6aMDSOoMOrBr`, SMTP `apJmJfvec2P8KOG7` y Brevo
+  `SklCy2UMq5G0elbg`.
+
+Prueba segura:
+
+1. Mantenga el coordinador inactivo.
+2. Conserve `testMode=true`, `dryRun=true` y `emailTo` vacío.
+3. Ejecute una ventana histórica desde un trigger manual.
+4. Confirme `status=dry_run`, conteos mayores que cero cuando existan
+   publicaciones y HTML no vacío.
+5. Revise visualmente el HTML antes de habilitar una prueba SMTP.
+
+La validación del 21 de agosto de 2026 usó la ventana
+`2026-08-13T00:00:00Z`–`2026-08-20T16:00:00Z`: recuperó 3 noticias,
+seleccionó 2 banners y compiló 25,508 bytes de HTML. No envió correo ni avanzó
+el cursor. El workflow temporal usado para esta prueba fue archivado.
+
+## Boletín mensual de Prensa para Aliados
+
+El coordinador `APP — Prensa PUCMM — Boletín mensual` ejecuta el primer lunes
+a las 10:00 y calcula el mes calendario anterior. Reutiliza el mismo
+orquestador de Prensa y selecciona la rama Brevo; usa el orden Rectoría,
+Portal PUCMM y demás noticias, con fecha descendente e ID ascendente.
+
+El dry-run validado en n8n calculó julio de 2026, recuperó 28 noticias y
+generó 111,769 bytes de HTML. No creó campaña Brevo ni envió correo. Los
+constructores antiguos de `boletin-aliados` fueron archivados.
+
+La rama Brevo está preparada para crear un borrador, enviar solo `sendTest`
+en modo prueba y quedar en `awaiting_approval` antes de cualquier envío
+productivo. Las listas de producción son `2,4,146,160,164,165,170,189,190` y
+la lista de prueba es `116`. La documentación específica está en
+[docs/brevo-campaign-audit.md](docs/brevo-campaign-audit.md).
+
+Antes de producción todavía se debe configurar `emailTo`, realizar una
+prueba SMTP controlada, aprobar el render y activar expresamente el
+coordinador. La Data Table reduce duplicados mediante la biblioteca SMTP, pero
+no ofrece un bloqueo atómico entre ejecuciones concurrentes; para garantía
+fuerte se recomienda PostgreSQL o Redis con restricción única/lock.

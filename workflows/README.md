@@ -27,3 +27,5 @@ Las etiquetas complementan las carpetas y permiten búsquedas transversales:
 Cada aplicación y biblioteca mantiene su propio `README.md` con IDs de n8n,
 dependencias, orden de importación y consideraciones operativas. El archivo
 `.json` en esta carpeta contiene metadata del repositorio y no es un workflow.
+
+Aplicaciones actuales: `agenda-pucmm` y `boletin-interno-prensa`.

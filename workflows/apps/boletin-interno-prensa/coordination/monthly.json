@@ -1,0 +1,160 @@
+{
+  "id": "e1a71f7ed90c4ef4",
+  "name": "APP — Prensa PUCMM — Boletín mensual",
+  "description": "Coordina el boletín mensual de Prensa por Brevo usando el mismo orquestador único; permanece inactivo.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "0917dc2ddc3fdc08",
+      "name": "Horario primer lunes mensual",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -700,
+        420
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 1-7 * 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3f971dbe7db1d165",
+      "name": "Prueba manual mensual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        560
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "2c962bb637f848e1",
+      "name": "Calcular mes anterior",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        480
+      ],
+      "parameters": {
+        "jsCode": "const n=new Date($json.referenceNow||'2026-06-01T10:00:00-04:00');const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Santo_Domingo',year:'numeric',month:'numeric'}).formatToParts(n).map(x=>[x.type,x.value]));const y=+p.year,m=+p.month;return [{json:{referenceNow:n.toISOString(),windowStart:new Date(Date.UTC(y,m-2,1,4)).toISOString(),windowEndExclusive:new Date(Date.UTC(y,m-1,1,4)).toISOString(),recipientGroup:'internal-community-monthly',digestType:'monthly',emailTransport:'brevo',testMode:$execution.mode==='manual',forceResend:$execution.mode==='manual',windowSource:'previous_calendar_month'}}];"
+      }
+    },
+    {
+      "id": "a26c329258b89ea3",
+      "name": "Ejecutar orquestador único mensual",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        480
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "654286fe97f96096"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "e46afdb0b5f97be5",
+      "name": "Preparar mes anterior de prueba",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        600
+      ],
+      "parameters": {
+        "jsCode": "const n=new Date($json.referenceNow||'2026-06-01T10:00:00-04:00');const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/Santo_Domingo',year:'numeric',month:'numeric'}).formatToParts(n).map(x=>[x.type,x.value]));const y=+p.year,m=+p.month;return [{json:{referenceNow:n.toISOString(),windowStart:new Date(Date.UTC(y,m-2,1,4)).toISOString(),windowEndExclusive:new Date(Date.UTC(y,m-1,1,4)).toISOString(),recipientGroup:'internal-community-monthly',digestType:'monthly',emailTransport:'brevo',testMode:true,forceResend:true,windowSource:'previous_calendar_month'}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Horario primer lunes mensual": {
+      "main": [
+        [
+          {
+            "node": "Calcular mes anterior",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prueba manual mensual": {
+      "main": [
+        [
+          {
+            "node": "Preparar mes anterior de prueba",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular mes anterior": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar orquestador único mensual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar mes anterior de prueba": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar orquestador único mensual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "availableInMCP": true,
+    "errorWorkflow": "bbb56f7efb469be8"
+  },
+  "versionId": "00000000-0000-4000-8000-000000000002",
+  "tags": [
+    {
+      "id": "FpkNzlfnIlv0vKKm",
+      "name": "tipo:coordinador"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    },
+    {
+      "id": "vWtTfSH6USLlhmO4",
+      "name": "formato:mjml"
+    }
+  ]
+}
