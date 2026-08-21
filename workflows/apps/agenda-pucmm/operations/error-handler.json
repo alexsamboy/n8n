@@ -1,7 +1,6 @@
 {
   "id": "cf9eb8c32404623b",
-  "name": "Agenda PUCMM — error-handler",
-  "description": "Recibe errores de los workflows de Agenda PUCMM, normaliza el diagnóstico y envía una notificación sanitizada sin exponer credenciales ni contenido sensible.",
+  "name": "OPS — Agenda PUCMM — Manejo de errores",
   "nodes": [
     {
       "id": "agenda-001",
@@ -178,8 +177,21 @@
   },
   "tags": [
     {
-      "id": "agenda-pucmm",
-      "name": "Agenda PUCMM"
+      "id": "v1sDNPSmEjCPe4Uz",
+      "name": "app:agenda-pucmm"
+    },
+    {
+      "id": "0ZpdqW5xIOojk8Ov",
+      "name": "tipo:operaciones"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
     }
-  ]
+  ],
+  "description": "Recibe errores de los workflows de Agenda PUCMM, normaliza el diagnóstico y envía una notificación sanitizada sin exponer credenciales ni contenido sensible."
 }

@@ -1,6 +1,6 @@
 {
   "id": "81aa01934460cec1",
-  "name": "Agenda PUCMM — build-and-send-digest",
+  "name": "ORCH — Agenda PUCMM — Construir y enviar",
   "nodes": [
     {
       "parameters": {
@@ -1070,8 +1070,16 @@
   },
   "tags": [
     {
-      "id": "agenda-pucmm",
-      "name": "Agenda PUCMM"
+      "id": "v1sDNPSmEjCPe4Uz",
+      "name": "app:agenda-pucmm"
+    },
+    {
+      "id": "E5zpZbg1ZklwhBHC",
+      "name": "tipo:orquestador"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
     }
   ],
   "description": "Consulta actividades y banners de Día PUCMM, genera el boletín responsive en MJML y coordina los envíos internos por SMTP y mensuales a Aliados mediante Brevo."

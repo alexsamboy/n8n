@@ -1,6 +1,6 @@
 {
   "id": "SklCy2UMq5G0elbg",
-  "name": "LIB — Campaña Brevo",
+  "name": "LIB — Mensajería — Campaña Brevo",
   "nodes": [
     {
       "id": "8792cae2-2470-4ec7-bb9a-bae5a5a8d2a3",
@@ -212,13 +212,13 @@
           "timeout": 15000
         }
       },
+      "alwaysOutputData": true,
       "credentials": {
         "sendInBlueApi": {
           "id": "brevo-shared",
           "name": "Brevo"
         }
-      },
-      "alwaysOutputData": true
+      }
     },
     {
       "id": "b5eaf338-79f1-45cd-9fbe-ea77f472f51e",
@@ -369,6 +369,19 @@
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
   },
-  "tags": [],
+  "tags": [
+    {
+      "id": "BTfTdVEf6F9VUKXG",
+      "name": "tipo:libreria"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
+    }
+  ],
   "description": "Crea y programa campañas Brevo reutilizables con contrato v1, validación de lista 116 para pruebas, idempotencia y métricas."
 }

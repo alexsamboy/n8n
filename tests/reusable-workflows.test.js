@@ -3,10 +3,10 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const agenda = require("../workflows/pucmm/agenda-build-send.json");
-const mjml = require("../workflows/pucmm/lib-compile-mjml.json");
-const brevo = require("../workflows/pucmm/lib-brevo-campaign.json");
-const smtp = require("../workflows/pucmm/lib-send-smtp.json");
+const agenda = require("../workflows/apps/agenda-pucmm/orchestration/build-send-digest.json");
+const mjml = require("../workflows/libraries/messaging/compile-mjml.json");
+const brevo = require("../workflows/libraries/messaging/brevo-campaign.json");
+const smtp = require("../workflows/libraries/messaging/send-smtp.json");
 
 test("Agenda delegates MJML, SMTP and Brevo to reusable workflows", () => {
   const executeNodes = agenda.nodes.filter((node) => node.type === "n8n-nodes-base.executeWorkflow");

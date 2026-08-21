@@ -1,6 +1,6 @@
 {
   "id": "apJmJfvec2P8KOG7",
-  "name": "LIB — Enviar por SMTP",
+  "name": "LIB — Mensajería — Enviar SMTP",
   "nodes": [
     {
       "id": "9799bd8e-3640-4b74-91c6-13157a9f30fc",
@@ -295,6 +295,19 @@
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
   },
-  "tags": [],
+  "tags": [
+    {
+      "id": "BTfTdVEf6F9VUKXG",
+      "name": "tipo:libreria"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
+    }
+  ],
   "description": "Envía HTML por SMTP con contrato v1, validación de destinatarios y dominios, idempotencia, auditoría en Data Table y métricas sanitizadas."
 }

@@ -13,19 +13,20 @@ pero no tienen disparadores autónomos y no realizan envíos por sí solas.
 
 ## Arquitectura
 
-- `agenda-monthly.json`: primer lunes del mes; mes calendario completo.
-- `agenda-weekly.json`: demás lunes; lunes a lunes siguiente.
-- `agenda-daily.json`: martes a sábado; día calendario completo.
-- `agenda-build-send.json`: consulta, validación, publicidad y orquestación de
-  los canales de salida.
-- `agenda-error-handler.json`: alerta operativa sanitizada.
-- `lib-compile-mjml.json`: subworkflow reutilizable que valida el contrato v1,
-  compila MJML y devuelve el HTML junto con métricas y contexto.
-- `lib-brevo-campaign.json`: subworkflow reutilizable que valida destinatarios,
-  aplica idempotencia, crea y programa campañas con la credencial `Brevo`.
-- `lib-send-smtp.json`: subworkflow reutilizable que valida remitente,
-  destinatarios y dominios, evita duplicados, envía con la credencial
-  `PUCMM Agenda SMTP` y registra el resultado.
+- `workflows/apps/agenda-pucmm/coordinators/`: coordinadores mensual, semanal
+  y diario.
+- `workflows/apps/agenda-pucmm/orchestration/build-send-digest.json`: consulta,
+  validación, publicidad y orquestación de los canales.
+- `workflows/apps/agenda-pucmm/operations/error-handler.json`: alerta operativa
+  sanitizada.
+- `workflows/libraries/messaging/compile-mjml.json`: compilación MJML mediante
+  contrato v1.
+- `workflows/libraries/messaging/brevo-campaign.json`: idempotencia, creación y
+  programación de campañas con la credencial `Brevo`.
+- `workflows/libraries/messaging/send-smtp.json`: validación, idempotencia,
+  envío con `PUCMM Agenda SMTP` y auditoría.
+- `workflows/archive/agenda-pucmm/`: versiones históricas inactivas que no
+  deben importarse como producción.
 - `tools/mjml-service`: compilador local fijado a MJML 5.4.0.
 
 Los coordinadores comparten una decisión exclusiva. El domingo no produce
