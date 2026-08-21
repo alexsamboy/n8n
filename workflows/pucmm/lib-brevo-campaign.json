@@ -1,0 +1,374 @@
+{
+  "id": "SklCy2UMq5G0elbg",
+  "name": "LIB — Campaña Brevo",
+  "nodes": [
+    {
+      "id": "8792cae2-2470-4ec7-bb9a-bae5a5a8d2a3",
+      "name": "Entrada de campaña Brevo",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "contractVersion",
+              "type": "number"
+            },
+            {
+              "name": "testMode",
+              "type": "boolean"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "tag",
+              "type": "string"
+            },
+            {
+              "name": "subject",
+              "type": "string"
+            },
+            {
+              "name": "html",
+              "type": "string"
+            },
+            {
+              "name": "senderId",
+              "type": "number"
+            },
+            {
+              "name": "replyTo",
+              "type": "string"
+            },
+            {
+              "name": "listIds",
+              "type": "array"
+            },
+            {
+              "name": "dataTableId",
+              "type": "string"
+            },
+            {
+              "name": "idempotencyKey",
+              "type": "string"
+            },
+            {
+              "name": "recipientGroup",
+              "type": "string"
+            },
+            {
+              "name": "digestType",
+              "type": "string"
+            },
+            {
+              "name": "windowStart",
+              "type": "string"
+            },
+            {
+              "name": "windowEndExclusive",
+              "type": "string"
+            },
+            {
+              "name": "activityCount",
+              "type": "number"
+            },
+            {
+              "name": "adCount",
+              "type": "number"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c57aa55b-fdaf-4616-8cdc-effbc9076f84",
+      "name": "Validar entrada Brevo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const x=$json;if(Number(x.contractVersion)!==1)throw new Error('contractVersion Brevo no soportada');for(const f of ['name','tag','subject','html','replyTo','dataTableId','idempotencyKey','recipientGroup','digestType','windowStart','windowEndExclusive'])if(typeof x[f]!=='string'||!x[f].trim())throw new Error('Brevo requiere '+f);if(!x.html.toLowerCase().includes('<html'))throw new Error('Brevo requiere HTML compilado');const senderId=Number(x.senderId);if(!Number.isInteger(senderId)||senderId<1)throw new Error('senderId Brevo inválido');const listIds=[...new Set((Array.isArray(x.listIds)?x.listIds:[]).map(Number))];if(!listIds.length||listIds.some(id=>!Number.isInteger(id)||id<1))throw new Error('listIds Brevo inválidos');const testMode=Boolean(x.testMode);if(testMode&&(listIds.length!==1||listIds[0]!==116))throw new Error('Las pruebas Brevo solo pueden usar la lista 116');if(!testMode&&listIds.includes(116))throw new Error('Producción Brevo no puede usar la lista 116');return [{json:{...x,contractVersion:1,testMode,senderId,listIds,name:x.name.trim(),tag:x.tag.trim(),subject:x.subject.trim(),replyTo:x.replyTo.trim(),dataTableId:x.dataTableId.trim(),idempotencyKey:x.idempotencyKey.trim(),recipientGroup:x.recipientGroup.trim(),digestType:x.digestType.trim(),startedAt:new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "e1e7a50c-ff34-4b43-9056-c00f567b5cc4",
+      "name": "Verificar idempotencia Brevo",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.dataTableId }}"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "execution_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "e1468dc4-ac5b-4552-bb77-9490fb041cb0",
+      "name": "Crear campaña Brevo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.brevo.com/v3/emailCampaigns",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ ({ name: $('Validar entrada Brevo').item.json.name, tag: $('Validar entrada Brevo').item.json.tag, subject: $('Validar entrada Brevo').item.json.subject, sender: { id: $('Validar entrada Brevo').item.json.senderId }, replyTo: $('Validar entrada Brevo').item.json.replyTo, recipients: { listIds: $('Validar entrada Brevo').item.json.listIds }, htmlContent: $('Validar entrada Brevo').item.json.html }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      }
+    },
+    {
+      "id": "97fb36ed-cfb7-40e5-88f2-e4841bffd370",
+      "name": "Conservar campaña creada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const source=$('Validar entrada Brevo').item.json;const campaignId=Number($json.id);if(!Number.isInteger(campaignId)||campaignId<1)throw new Error('Brevo no devolvió campaignId');const campaignCreatedAt=new Date().toISOString();return [{json:{...source,campaignId,campaignCreatedAt,createDurationMs:Date.now()-new Date(source.startedAt).valueOf()}}];"
+      }
+    },
+    {
+      "id": "4b1ee37a-3420-43ee-ad9c-13d240c8526e",
+      "name": "Programar campaña Brevo ahora",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.brevo.com/v3/emailCampaigns/{{ $json.campaignId }}/sendNow",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "sendInBlueApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "autodetect"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "credentials": {
+        "sendInBlueApi": {
+          "id": "brevo-shared",
+          "name": "Brevo"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "b5eaf338-79f1-45cd-9fbe-ea77f472f51e",
+      "name": "Registrar campaña programada",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Validar entrada Brevo').item.json.dataTableId }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_key": "={{ $('Validar entrada Brevo').item.json.idempotencyKey }}",
+            "digest_type": "={{ $('Validar entrada Brevo').item.json.digestType }}",
+            "window_start": "={{ $('Validar entrada Brevo').item.json.windowStart }}",
+            "window_end": "={{ $('Validar entrada Brevo').item.json.windowEndExclusive }}",
+            "recipient_group": "={{ $('Validar entrada Brevo').item.json.recipientGroup }}",
+            "status": "scheduled",
+            "message_id": "={{ $('Conservar campaña creada').item.json.campaignId }}",
+            "sent_at": "={{ $now.toISO() }}",
+            "activity_count": "={{ $('Validar entrada Brevo').item.json.activityCount }}",
+            "ad_count": "={{ $('Validar entrada Brevo').item.json.adCount }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "2e478c99-3e71-42d4-b61d-580ace988f45",
+      "name": "Resultado Brevo programado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const source=$('Conservar campaña creada').item.json;return [{json:{contractVersion:1,status:'scheduled',transport:'brevo-campaign',campaignId:source.campaignId,createDurationMs:source.createDurationMs,scheduleDurationMs:Date.now()-new Date(source.campaignCreatedAt).valueOf(),durationMs:Date.now()-new Date(source.startedAt).valueOf(),idempotencyKey:source.idempotencyKey}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Entrada de campaña Brevo": {
+      "main": [
+        [
+          {
+            "node": "Validar entrada Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar entrada Brevo": {
+      "main": [
+        [
+          {
+            "node": "Verificar idempotencia Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar idempotencia Brevo": {
+      "main": [
+        [
+          {
+            "node": "Crear campaña Brevo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear campaña Brevo": {
+      "main": [
+        [
+          {
+            "node": "Conservar campaña creada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conservar campaña creada": {
+      "main": [
+        [
+          {
+            "node": "Programar campaña Brevo ahora",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Programar campaña Brevo ahora": {
+      "main": [
+        [
+          {
+            "node": "Registrar campaña programada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar campaña programada": {
+      "main": [
+        [
+          {
+            "node": "Resultado Brevo programado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Santo_Domingo",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6b9482d1-12dc-4ab5-bd13-99bd80d00d61",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "description": "Crea y programa campañas Brevo reutilizables con contrato v1, validación de lista 116 para pruebas, idempotencia y métricas."
+}

@@ -44,7 +44,7 @@
         0
       ],
       "parameters": {
-        "jsCode": "const ZONE = 'America/Santo_Domingo';\nconst OFFSET = '-04:00';\nconst pad = n => String(n).padStart(2, '0');\nconst reference = $json.referenceDate ? new Date($json.referenceDate) : new Date();\nif (Number.isNaN(reference.valueOf())) throw new Error('referenceDate inválida');\nconst parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:ZONE,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(reference).map(p=>[p.type,p.value]));\nconst today = {year:+parts.year,month:+parts.month,day:+parts.day};\nconst shift = (p,d) => { const x=new Date(Date.UTC(p.year,p.month-1,p.day+d)); return {year:x.getUTCFullYear(),month:x.getUTCMonth()+1,day:x.getUTCDate()}; };\nconst iso = p => p.year+'-'+pad(p.month)+'-'+pad(p.day)+'T00:00:00'+OFFSET;\nconst dow = new Date(Date.UTC(today.year,today.month-1,today.day)).getUTCDay();\nlet digestType='none', start, end;\nif (dow===1 && today.day<=7) { digestType='monthly'; start={year:today.year,month:today.month,day:1}; end=today.month===12?{year:today.year+1,month:1,day:1}:{year:today.year,month:today.month+1,day:1}; }\nelse if (dow===1) { digestType='weekly'; start=today; end=shift(today,7); }\nelse if (dow>=2 && dow<=6) { digestType='daily'; start=today; end=shift(today,1); }\nif (digestType !== 'daily') return [];\nreturn [{json:{digestType,windowStart:iso(start),windowEndExclusive:iso(end),referenceDate:reference.toISOString(),recipientGroup:digestType,timezone:ZONE}}];"
+        "jsCode": "const ZONE = 'America/Santo_Domingo';\nconst OFFSET = '-04:00';\nconst TEST_REFERENCE_DATE = '2026-06-02T12:00:00-04:00';\nconst pad = n => String(n).padStart(2, '0');\nconst reference = $json.referenceDate ? new Date($json.referenceDate) : new Date($execution.mode === 'test' ? TEST_REFERENCE_DATE : Date.now());\nif (Number.isNaN(reference.valueOf())) throw new Error('referenceDate inválida');\nconst parts = Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:ZONE,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(reference).map(p=>[p.type,p.value]));\nconst today = {year:+parts.year,month:+parts.month,day:+parts.day};\nconst shift = (p,d) => { const x=new Date(Date.UTC(p.year,p.month-1,p.day+d)); return {year:x.getUTCFullYear(),month:x.getUTCMonth()+1,day:x.getUTCDate()}; };\nconst iso = p => p.year+'-'+pad(p.month)+'-'+pad(p.day)+'T00:00:00'+OFFSET;\nconst dow = new Date(Date.UTC(today.year,today.month-1,today.day)).getUTCDay();\nlet digestType='none', start, end;\nif (dow===1 && today.day<=7) { digestType='monthly'; start={year:today.year,month:today.month,day:1}; end=today.month===12?{year:today.year+1,month:1,day:1}:{year:today.year,month:today.month+1,day:1}; }\nelse if (dow===1) { digestType='weekly'; start=today; end=shift(today,7); }\nelse if (dow>=2 && dow<=6) { digestType='daily'; start=today; end=shift(today,1); }\nif (digestType !== 'daily') return [];\nreturn [{json:{digestType,windowStart:iso(start),windowEndExclusive:iso(end),referenceDate:reference.toISOString(),recipientGroup:digestType,timezone:ZONE}}];"
       }
     },
     {
@@ -115,7 +115,7 @@
     "binaryMode": "separate",
     "availableInMCP": true
   },
-  "versionId": "1fb229a1-7ff3-4cfd-85b1-5247b5b338c3",
+  "versionId": "b4b14127-bb56-44c4-9038-9e1ce6c3845b",
   "meta": {
     "templateCredsSetupCompleted": false
   },

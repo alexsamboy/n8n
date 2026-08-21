@@ -12,19 +12,24 @@ for (const count of [0, 1, 2, 3, 5]) {
     const activities = Array.from({ length: count }, (_, index) => activity(index + 1));
     const mjml = renderMjml({ ...base, activities, ads: [] });
     assert.equal((mjml.match(/event-title/g) || []).length, count + 1);
+    assert.equal((activityRows(activities).match(/<mj-group/g) || []).length, count);
     assert.equal((activityRows(activities).match(/<mj-section/g) || []).length, Math.ceil(count / 2));
+    assert.equal((activityRows(activities).match(/<mj-group css-class="row" width="50%">/g) || []).length, count % 2);
     assert.equal(mjml.includes("{{"), false);
-    assert.equal(mjml.includes("width=\"640px\""), true);
+    assert.equal(mjml.includes("width=\"800px\""), true);
     assert.equal(mjml.includes("No hay actividades publicadas"), count === 0);
   });
 }
 
 test("template includes responsive and accessible defaults", () => {
   const mjml = renderMjml({ ...base, preview: "Resumen distinto", activities: [activity(1)], ads: [] });
-  assert.match(mjml, /<mj-breakpoint width="480px"/);
+  assert.match(mjml, /<mj-breakpoint width="575px"/);
   assert.match(mjml, /<mj-preview>Resumen distinto<\/mj-preview>/);
-  assert.match(mjml, /font-size="15px"/);
+  assert.match(mjml, /mj-font name="Baskerville"/);
   assert.match(mjml, /title="Ver todas las actividades de PUCMM"/);
+  assert.match(mjml, /Haz visibles tus actividades en <b>PUCMM Día a Día<\/b>/);
+  assert.match(mjml, /<mj-column width="40%">/);
+  assert.match(mjml, /Unidad Comunicación Interna/);
 });
 
 test("one ad is bottom and two ads surround activities", () => {

@@ -1,0 +1,159 @@
+{
+  "id": "73pz6aMDSOoMOrBr",
+  "name": "LIB — Compilar MJML",
+  "nodes": [
+    {
+      "id": "fb4303f2-b61c-4940-b155-3deefbc31cae",
+      "name": "Entrada de compilación MJML",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "contractVersion",
+              "type": "number"
+            },
+            {
+              "name": "mjml",
+              "type": "string"
+            },
+            {
+              "name": "correlationId",
+              "type": "string"
+            },
+            {
+              "name": "context",
+              "type": "object"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "9e7811c0-83d6-4a4e-b2dd-a7a7d854be71",
+      "name": "Validar entrada MJML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const input=$json;if(Number(input.contractVersion)!==1)throw new Error('contractVersion MJML no soportada');if(typeof input.mjml!=='string'||!input.mjml.trim().startsWith('<mjml'))throw new Error('Se requiere MJML válido');const correlationId=String(input.correlationId||'').trim();if(!correlationId)throw new Error('Se requiere correlationId');const context=input.context&&typeof input.context==='object'&&!Array.isArray(input.context)?input.context:{};return [{json:{contractVersion:1,mjml:input.mjml,correlationId,context,compileStartedAt:new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "7a98f304-d6c6-4063-ab2e-329b43c91979",
+      "name": "Compilar MJML",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://mjml:3000/render",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({mjml: $json.mjml}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          },
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "9fcb5f89-3f76-4b49-be4d-98da447a9a3b",
+      "name": "Devolver HTML compilado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const source=$('Validar entrada MJML').item.json;const buffer=await this.helpers.getBinaryDataBuffer(0,'data');let payload;try{payload=JSON.parse(buffer.toString('utf8'));}catch(e){throw new Error('Respuesta MJML inválida o incompleta: '+e.message);}const html=payload.html;if(typeof html!=='string'||!html.trim())throw new Error('MJML no produjo HTML');return [{json:{...source.context,contractVersion:1,status:'compiled',html,htmlSize:new TextEncoder().encode(html).length,compileDurationMs:Date.now()-new Date(source.compileStartedAt).valueOf(),correlationId:source.correlationId}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Entrada de compilación MJML": {
+      "main": [
+        [
+          {
+            "node": "Validar entrada MJML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar entrada MJML": {
+      "main": [
+        [
+          {
+            "node": "Compilar MJML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compilar MJML": {
+      "main": [
+        [
+          {
+            "node": "Devolver HTML compilado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Santo_Domingo",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "7d5cd08b-bf55-4ba3-a3d4-82f7ba1c9e15",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [],
+  "description": "Compila MJML reutilizable a HTML mediante el servicio local, valida el contrato v1 y devuelve tamaño, duración y correlación."
+}
