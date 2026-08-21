@@ -65,8 +65,8 @@
             {
               "id": "cfg-4",
               "name": "testMode",
-              "value": true,
-              "type": "boolean"
+          "value": false,
+          "type": "boolean"
             },
             {
               "id": "cfg-5",
