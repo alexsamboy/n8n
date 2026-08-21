@@ -6,7 +6,8 @@ y envía un boletín mensual, semanal o diario según la fecha. El correo
 institucional sale por SMTP; el boletín mensual genera además una campaña en
 Brevo.
 
-Los coordinadores y el orquestador permanecen **inactivos**. Las dos
+Los coordinadores y el orquestador permanecen **inactivos** en los archivos
+importables. Las tres
 bibliotecas están publicadas porque n8n lo exige para ejecutar subworkflows,
 pero no tienen disparadores autónomos y no realizan envíos por sí solas.
 
@@ -22,10 +23,21 @@ pero no tienen disparadores autónomos y no realizan envíos por sí solas.
   compila MJML y devuelve el HTML junto con métricas y contexto.
 - `lib-brevo-campaign.json`: subworkflow reutilizable que valida destinatarios,
   aplica idempotencia, crea y programa campañas con la credencial `Brevo`.
+- `lib-send-smtp.json`: subworkflow reutilizable que valida remitente,
+  destinatarios y dominios, evita duplicados, envía con la credencial
+  `PUCMM Agenda SMTP` y registra el resultado.
 - `tools/mjml-service`: compilador local fijado a MJML 5.4.0.
 
 Los coordinadores comparten una decisión exclusiva. El domingo no produce
 salida. Todos usan intervalos semiabiertos y zona horaria institucional.
+
+### Plantilla y presentación
+
+La plantilla institucional usa `<mj-body width="900px">` y conserva el
+breakpoint móvil en `575px`. Las actividades se agrupan de dos en dos; cuando
+la última fila contiene una sola actividad, su `mj-group` utiliza
+`width="50%"`. La ubicación muestra hasta 34 caracteres antes de añadir
+`…`, mientras el atributo `title` conserva el texto completo.
 
 ## Configuración en n8n
 
@@ -53,6 +65,12 @@ confirma la programación. Para una repetición controlada, cambie
 temporalmente `forceResend` a `true` en `Configuración segura` y vuelva a
 `false` inmediatamente.
 
+La biblioteca SMTP recibe el contrato `v1` con remitente, destinatarios,
+dominios permitidos, asunto, HTML compilado y metadatos de auditoría. Rechaza
+direcciones inválidas o fuera de los dominios permitidos, comprueba
+`idempotencyKey`, envía una sola vez y devuelve únicamente estado, conteos,
+duración y message ID; no devuelve HTML ni listas de destinatarios.
+
 ### 2. Credenciales de correo
 
 El workflow utiliza estas credenciales reutilizables de n8n:
@@ -68,14 +86,19 @@ tokens ni secretos en Git o en Code nodes.
 ### 3. Configuración incorporada
 
 La edición comunitaria no depende de variables de n8n: los valores no secretos
-se conservan en el nodo `Configuración segura`. El workflow queda en
-`testMode=true` y apunta a `manuelperez@pucmm.edu.do` durante las pruebas.
+se conservan en el nodo `Configuración segura`. La versión de producción queda
+en `testMode=false`; para una prueba manual controlada debe cambiarse
+temporalmente a `true`, lo que dirige SMTP a
+`manuelperez@pucmm.edu.do`.
 
 En producción, SMTP utiliza exclusivamente:
 
 - `comunidad@pucmm.edu.do`
 - `st-estudiante@ce.pucmm.edu.do`
 - `sd-estudiante@ce.pucmm.edu.do`
+
+Estos destinatarios se mantienen una sola vez en `emailToInternal`. El nombre
+visible del remitente es `Comunicaciones PUCMM`.
 
 El envío mensual adicional de Brevo utiliza la lista `116` en pruebas y las
 listas `2`, `4`, `146`, `160`, `164`, `165`, `170`, `189` y `190` en
@@ -117,11 +140,11 @@ lista `errors`; un HTML vacío hace fallar el workflow.
 
 Los archivos son importables desde la interfaz o, dentro del contenedor, con
 `n8n import:workflow --input=/ruta/archivo.json`. Importe primero el manejador
-de errores; después las bibliotecas MJML y Brevo; luego `build-send`; y al final
-los tres coordinadores. Asigne la credencial `Brevo` dentro de su biblioteca y
-la credencial SMTP dentro de `build-send`. Los IDs usados por el orquestador son
-`73pz6aMDSOoMOrBr` para MJML, `SklCy2UMq5G0elbg` para Brevo y
-`81aa01934460cec1` para `build-send`.
+de errores; después las bibliotecas MJML, SMTP y Brevo; luego `build-send`; y
+al final los tres coordinadores. Asigne cada credencial exclusivamente dentro
+de su biblioteca. Los IDs usados por el orquestador son
+`73pz6aMDSOoMOrBr` para MJML, `apJmJfvec2P8KOG7` para SMTP,
+`SklCy2UMq5G0elbg` para Brevo y `81aa01934460cec1` para `build-send`.
 
 ## Operación y rollback
 

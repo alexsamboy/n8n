@@ -12,6 +12,7 @@ const expected = [
   "agenda-error-handler.json",
   "lib-compile-mjml.json",
   "lib-brevo-campaign.json",
+  "lib-send-smtp.json",
 ];
 let failed = false;
 for (const file of expected) {

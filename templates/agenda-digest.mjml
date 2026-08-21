@@ -11,7 +11,7 @@
       .test-banner div { color: #5b4700 !important; font-family: Arial, Helvetica, sans-serif !important; }
     </mj-style>
   </mj-head>
-  <mj-body width="800px" background-color="#f0f0f0">
+  <mj-body width="900px" background-color="#f0f0f0">
     {{TEST_BANNER}}
     <mj-wrapper full-width="full-width" padding="0px" background-color="#00369c">
       <mj-section background-color="#00369c">
