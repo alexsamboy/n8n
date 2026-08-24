@@ -12,3 +12,8 @@ de subworkflow.
 
 Las respuestas solo deben exponer estado, identificadores, conteos y duración.
 No deben devolver secretos, HTML completo ni listas de destinatarios.
+
+En modo de desarrollo, `brevo-campaign.json` exige `testEmails` y enruta la
+campaña por `POST /v3/emailCampaigns/{campaignId}/sendTest`. La rama
+`sendNow` queda reservada para producción; el orquestador de Prensa no puede
+pasar destinatarios reales mientras `developmentMode=true`.

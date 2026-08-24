@@ -121,6 +121,14 @@ habiliten o documenten, usar `placement=null`, `priority=0` y ordenar por ID
 ascendente como desempate estable. Seleccionar como máximo dos anuncios tras
 filtrar vigencia y validar ambas URL HTTPS.
 
+El orquestador de Prensa no ignora una prioridad si el origen la entrega en
+una respuesta extendida: normaliza `priority`, `prioridad`,
+`newsletter.priority` o `newsletter.prioridad` como número y ordena por
+prioridad descendente, luego `activeFrom` descendente e ID ascendente. Con el
+esquema público actualmente verificado esos campos no llegan y el valor
+seguro permanece en cero; no se añadió un campo GraphQL no confirmado que
+pueda romper la consulta.
+
 ## Paginación y filtros
 
 - Tamaño previsto: `first: 100`.

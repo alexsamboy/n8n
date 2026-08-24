@@ -21,10 +21,11 @@
   `LIB — Mensajería — Campaña Brevo`.
 - Data Table `Boletín Interno Prensa — estado`, ID `nRoI0Ta5SQizvi0U`.
 
-Los coordinadores se importan inactivos. Las pruebas siguen el patrón de
-Agenda: el trigger manual inyecta una ventana histórica y `testMode=true`,
-mientras el horario automático usa `testMode=false`. No existe una rama
-`dryRun` dentro del orquestador.
+Los coordinadores se importan inactivos. El orquestador está bloqueado en modo
+desarrollo: fuerza `testMode=true` y solo permite el destinatario de pruebas
+`manuelperez@pucmm.edu.do`, aunque una entrada intente cambiar ese indicador.
+No existe una rama `dryRun` dentro del orquestador; una ejecución manual solo
+puede enviar a esa dirección de prueba.
 
 En la instancia actual, el orquestador y el manejador están publicados porque
 `Execute Workflow` requiere una versión publicada. No tienen disparador
@@ -36,9 +37,10 @@ autónomo. El coordinador sigue inactivo.
 2. Importe el manejador de errores, el orquestador y finalmente ambos
    coordinadores.
 3. Confirme las dos credenciales WordPress y la Data Table.
-4. Ejecute manualmente con dry-run y revise conteos, ventana y render.
-5. Configure remitente y destinatarios; desactive dry-run solo durante una
-   prueba controlada manteniendo `testMode=true`.
+4. Ejecute manualmente y revise conteos, ventana y render; el correo solo se
+   entrega a la dirección de pruebas configurada.
+5. Mantenga el modo de desarrollo hasta autorizar explícitamente el cambio de
+   destinatarios y la activación de los coordinadores.
 6. No active el coordinador hasta autorización explícita.
 
 Rollback: desactive el coordinador y restaure la revisión Git anterior. No

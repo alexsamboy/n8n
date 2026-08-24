@@ -523,6 +523,7 @@
           "value": {
             "contractVersion": 1,
             "testMode": "={{ $json.testMode }}",
+            "testEmails": "={{ $json.emailTestRecipients }}",
             "name": "={{ ($json.testMode ? '[PRUEBA] ' : '') + 'Boletín Aliados ' + $now.setZone('America/Santo_Domingo').toFormat('yyyy-MM-dd') }}",
             "tag": "={{ ($json.testMode ? 'Prueba Boletín Aliados ' : 'Boletín Aliados ') + $now.setZone('America/Santo_Domingo').toFormat('yyyy-MM-dd') }}",
             "subject": "={{ $json.subject }}",
