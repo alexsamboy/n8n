@@ -1,0 +1,61 @@
+{
+  "id": "451883ca9fa2257d",
+  "name": "OPS — Prensa PUCMM — Manejo de errores Aliados",
+  "description": "Sanitiza errores de la campaña mensual Aliados sin secretos, PII ni HTML.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "cdfcf62e85e26c89",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "cb656d61d980d0ef",
+      "name": "Sanitizar error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const e=$json.execution||{};return [{json:{status:'failed',workflow:$json.workflow?.name||null,executionId:e.id||null,lastNode:e.lastNodeExecuted||null,error:String(e.error?.message||'Error').slice(0,500),timestamp:new Date().toISOString()}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sanitizar error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "availableInMCP": true
+  },
+  "tags": [
+    {
+      "id": "0ZpdqW5xIOojk8Ov",
+      "name": "tipo:operaciones"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    }
+  ]
+}

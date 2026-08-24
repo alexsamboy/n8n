@@ -1,0 +1,10 @@
+"use strict";
+const fs=require("node:fs"),path=require("node:path");
+const core=require("../src/press-core"),{renderPressMjml}=require("../src/render-press-mjml");
+const fixture=require("../fixtures/press-cases.json");
+const articles=core.dedupeSortArticles(fixture.articles.map(x=>core.normalizeArticle(x)).filter(x=>x.valid).map(x=>x.article));
+const banners=core.selectBanners(fixture.banners,"2026-08-21T14:00:00Z");
+const windowStart="2026-08-20T14:00:00.000Z",windowEndExclusive="2026-08-21T14:00:00.000Z";
+const executionKey=core.executionKey(windowStart,windowEndExclusive,"internal-community");
+const mjml=renderPressMjml({subject:"[PRUEBA] Boletín Interno Prensa",preheader:`${articles.length} noticias de Prensa PUCMM`,logoUrl:"https://pucmm.edu.do/wp-content/uploads/2026/07/pucmm-logo.svg",windowStart,windowEndExclusive,pressUrl:"https://prensa.pucmm.edu.do/noticias/",testMode:true,executionKey,articles,banners});
+const target=path.join(__dirname,"..","output","press");fs.mkdirSync(target,{recursive:true});fs.writeFileSync(path.join(target,"sample.mjml"),mjml);console.log(path.join(target,"sample.mjml"));

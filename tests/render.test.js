@@ -16,7 +16,7 @@ for (const count of [0, 1, 2, 3, 5]) {
     assert.equal((activityRows(activities).match(/<mj-section/g) || []).length, Math.ceil(count / 2));
     assert.equal((activityRows(activities).match(/<mj-group css-class="row" width="50%">/g) || []).length, count % 2);
     assert.equal(mjml.includes("{{"), false);
-    assert.equal(mjml.includes("width=\"800px\""), true);
+    assert.equal(mjml.includes("width=\"900px\""), true);
     assert.equal(mjml.includes("No hay actividades publicadas"), count === 0);
   });
 }
@@ -30,6 +30,14 @@ test("template includes responsive and accessible defaults", () => {
   assert.match(mjml, /Haz visibles tus actividades en <b>PUCMM Día a Día<\/b>/);
   assert.match(mjml, /<mj-column width="40%">/);
   assert.match(mjml, /Unidad Comunicación Interna/);
+});
+
+test("activity location shows up to 34 characters before truncation", () => {
+  const venue = "12345678901234567890123456789012345";
+  const mjml = activityRows([{ ...activity(1), venue }]);
+  assert.match(mjml, /1234567890123456789012345678901234…/);
+  assert.doesNotMatch(mjml, />12345678901234567890123456789012345<\/span>/);
+  assert.match(mjml, new RegExp(`title="${venue}"`));
 });
 
 test("one ad is bottom and two ads surround activities", () => {

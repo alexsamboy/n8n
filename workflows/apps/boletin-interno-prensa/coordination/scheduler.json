@@ -1,0 +1,211 @@
+{
+  "id": "f54704c5e44f602a",
+  "name": "APP — Prensa PUCMM — Boletín interno",
+  "description": "Coordina el boletín diario de Prensa por SMTP a las 10:00 de lunes a viernes; el mensual tiene un coordinador separado que reutiliza el mismo orquestador.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "49e9ce15aa5d532c",
+      "name": "Horario 10:00 lunes a viernes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -700,
+        -100
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * 1-5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "56d4ca28d0c3812e",
+      "name": "Prueba manual",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        120
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "d58654d15eca0811",
+      "name": "Preparar ventana de prueba 19 agosto",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        120
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{referenceNow:'2026-08-20T23:00:00-04:00',windowStart:'2026-08-19T00:00:00-04:00',windowEndExclusive:'2026-08-20T00:00:00-04:00',recipientGroup:'internal-community',digestType:'daily',emailTransport:'smtp',testMode:true,forceResend:true,windowSource:'fixed_test_2026-08-19'}}];"
+      }
+    },
+    {
+      "id": "c1e35baa270d42c8",
+      "name": "Leer último envío confirmado",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -460,
+        -100
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "nRoI0Ta5SQizvi0U"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "sent"
+            },
+            {
+              "keyName": "digest_type",
+              "condition": "eq",
+              "keyValue": "internal-press"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1,
+        "orderBy": true,
+        "orderByColumn": "window_end",
+        "orderByDirection": "DESC"
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "d4dcfa55c3587e82",
+      "name": "Calcular ventana segura",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -180,
+        -100
+      ],
+      "parameters": {
+        "jsCode": "const zone='America/Santo_Domingo';const manual=$execution.mode==='manual'&&!$json.referenceNow&&!$json.windowStart&&!$json.windowEndExclusive;const testNow='2026-08-20T23:00:00-04:00';const testStart='2026-08-19T00:00:00-04:00';const testEnd='2026-08-20T00:00:00-04:00';const now=manual?new Date(testNow):$json.referenceNow?new Date($json.referenceNow):new Date();if(Number.isNaN(now.valueOf()))throw new Error('referenceNow inválido');const dow=Number(new Intl.DateTimeFormat('en-US',{timeZone:zone,weekday:'short'}).format(now)==='Mon'?1:2);const hours=dow===1?72:24;const saved=$json.window_end&&$json.status==='sent'?$json.window_end:null;const start=manual?new Date(testStart):$json.windowStart?new Date($json.windowStart):saved?new Date(saved):new Date(now.valueOf()-hours*3600000);const end=manual?new Date(testEnd):$json.windowEndExclusive?new Date($json.windowEndExclusive):now;if(Number.isNaN(start.valueOf())||start>=end)throw new Error('Ventana inválida');return [{json:{referenceNow:now.toISOString(),windowStart:start.toISOString(),windowEndExclusive:end.toISOString(),recipientGroup:'internal-community',digestType:'daily',emailTransport:'smtp',testMode:manual,forceResend:manual,windowSource:manual?'fixed_test_2026-08-19':saved?'last_success':'fallback'}}];"
+      }
+    },
+    {
+      "id": "887471b539798783",
+      "name": "Ejecutar construcción y envío",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "654286fe97f96096"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Horario 10:00 lunes a viernes": {
+      "main": [
+        [
+          {
+            "node": "Leer último envío confirmado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prueba manual": {
+      "main": [
+        [
+          {
+            "node": "Preparar ventana de prueba 19 agosto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar ventana de prueba 19 agosto": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar construcción y envío",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer último envío confirmado": {
+      "main": [
+        [
+          {
+            "node": "Calcular ventana segura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular ventana segura": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar construcción y envío",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "availableInMCP": true,
+    "errorWorkflow": "bbb56f7efb469be8"
+  },
+  "versionId": "00000000-0000-4000-8000-000000000001",
+  "tags": [
+    {
+      "id": "FpkNzlfnIlv0vKKm",
+      "name": "tipo:coordinador"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    },
+    {
+      "id": "vWtTfSH6USLlhmO4",
+      "name": "formato:mjml"
+    }
+  ]
+}

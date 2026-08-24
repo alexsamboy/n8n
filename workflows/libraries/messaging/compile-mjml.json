@@ -1,6 +1,6 @@
 {
   "id": "73pz6aMDSOoMOrBr",
-  "name": "LIB — Compilar MJML",
+  "name": "LIB — Mensajería — Compilar MJML",
   "nodes": [
     {
       "id": "fb4303f2-b61c-4940-b155-3deefbc31cae",
@@ -154,6 +154,19 @@
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
   },
-  "tags": [],
+  "tags": [
+    {
+      "id": "BTfTdVEf6F9VUKXG",
+      "name": "tipo:libreria"
+    },
+    {
+      "id": "vWtTfSH6USLlhmO4",
+      "name": "formato:mjml"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
+    }
+  ],
   "description": "Compila MJML reutilizable a HTML mediante el servicio local, valida el contrato v1 y devuelve tamaño, duración y correlación."
 }

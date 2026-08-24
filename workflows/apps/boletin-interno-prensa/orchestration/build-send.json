@@ -1,0 +1,648 @@
+{
+  "id": "654286fe97f96096",
+  "name": "ORCH — Prensa PUCMM — Construir y enviar",
+  "description": "Consulta Prensa y banners con paginación, normaliza y compila MJML; selecciona SMTP diario o Brevo mensual según la configuración de entrada, siguiendo el patrón de pruebas del orquestador Agenda.",
+  "active": false,
+  "nodes": [
+    {
+      "id": "90563529c14c5159",
+      "name": "Entrada del boletín",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1100,
+        0
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "referenceNow"
+            },
+            {
+              "name": "windowStart"
+            },
+            {
+              "name": "windowEndExclusive"
+            },
+            {
+              "name": "recipientGroup"
+            },
+            {
+              "name": "digestType"
+            },
+            {
+              "name": "emailTransport"
+            },
+            {
+              "name": "forceResend",
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5a1d8f7e8f98841d",
+      "name": "Configuración segura",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -900,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "press-cfg-0",
+              "name": "developmentMode",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "press-cfg-1",
+              "name": "testMode",
+              "value": "={{ true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "press-cfg-2",
+              "name": "emailTransport",
+              "value": "={{ $json.emailTransport || 'smtp' }}",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-3",
+              "name": "digestType",
+              "value": "={{ $json.digestType || 'daily' }}",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-4",
+              "name": "pressGraphqlUrl",
+              "value": "https://prensa.pucmm.edu.do/graphql",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-5",
+              "name": "agendaGraphqlUrl",
+              "value": "https://dia.pucmm.edu.do/graphql",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-6",
+              "name": "wpPageSize",
+              "value": 50,
+              "type": "number"
+            },
+            {
+              "id": "press-cfg-7",
+              "name": "wpMaxPages",
+              "value": 100,
+              "type": "number"
+            },
+            {
+              "id": "press-cfg-8",
+              "name": "wpTimeoutMs",
+              "value": 30000,
+              "type": "number"
+            },
+            {
+              "id": "press-cfg-9",
+              "name": "excerptMaxChars",
+              "value": 320,
+              "type": "number"
+            },
+            {
+              "id": "press-cfg-10",
+              "name": "emailFrom",
+              "value": "comunicaciones@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-11",
+              "name": "emailFromName",
+              "value": "Comunicaciones PUCMM",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-12",
+              "name": "emailReplyTo",
+              "value": "info@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-13",
+              "name": "emailTo",
+              "value": "comunidad@pucmm.edu.do,st-estudiante@ce.pucmm.edu.do,sd-estudiante@ce.pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-14",
+              "name": "emailTestRecipients",
+              "value": "manuelperez@pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-15",
+              "name": "allowedDomains",
+              "value": "pucmm.edu.do,ce.pucmm.edu.do",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-16",
+              "name": "logoUrl",
+              "value": "https://pucmm.edu.do/wp-content/uploads/2026/07/pucmm-logo.svg",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-17",
+              "name": "pressUrl",
+              "value": "https://prensa.pucmm.edu.do/noticias/",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-18",
+              "name": "dataTableId",
+              "value": "nRoI0Ta5SQizvi0U",
+              "type": "string"
+            },
+            {
+              "id": "press-cfg-force",
+              "name": "forceResend",
+              "value": "={{ $json.forceResend === true }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "0e2a1438a7325022",
+      "name": "Preparar consultas GraphQL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const c=$json;const local=s=>{const d=new Date(s);const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Santo_Domingo',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(d).map(x=>[x.type,x.value]));return {year:+p.year,month:+p.month,day:+p.day};};const query='query Press($first:Int!,$cursor:String,$after:DateInput,$before:DateInput){posts(first:$first,after:$cursor,where:{dateQuery:{after:$after,before:$before,inclusive:true}}){nodes{databaseId title date link content featuredImage{node{sourceUrl altText mediaDetails{width height}}}categories{nodes{databaseId name slug}}opcionesPublicacion{portalPucmm campus dependencia{nodes{databaseId name slug}}}}pageInfo{hasNextPage endCursor}}}';const banners='query Banners($first:Int!,$cursor:String){banners(first:$first,after:$cursor,where:{status:PUBLISH}){nodes{databaseId title status newsletter{inicio fin enlace}featuredImage{node{sourceUrl altText mediaDetails{width height}}}}pageInfo{hasNextPage endCursor}}}';return [{json:{...c,pressBody:{query,variables:{first:c.wpPageSize,cursor:null,after:local(c.windowStart),before:local(c.windowEndExclusive)}},bannerBody:{query:banners,variables:{first:c.wpPageSize,cursor:null}}}}];"
+      }
+    },
+    {
+      "id": "673bdd124143f848",
+      "name": "Consultar Prensa paginada",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -500,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración segura').first().json.pressGraphqlUrl }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.pressBody }}",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "body",
+                    "name": "variables.cursor",
+                    "value": "={{ $response.body.data.posts.pageInfo.endCursor }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.data.posts.pageInfo.hasNextPage }}",
+              "limitPagesFetched": true,
+              "maxRequests": 100,
+              "requestInterval": 250
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "GbAhTYn0osJtfFWq",
+          "name": "Prensa PUCMM Wordpress API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "45c65cc9745abc19",
+      "name": "Consultar banners paginados",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -300,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuración segura').first().json.agendaGraphqlUrl }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Preparar consultas GraphQL').first().json.bannerBody }}",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "type": "body",
+                    "name": "variables.cursor",
+                    "value": "={{ $response.body.data.banners.pageInfo.endCursor }}"
+                  }
+                ]
+              },
+              "paginationCompleteWhen": "other",
+              "completeExpression": "={{ !$response.body.data.banners.pageInfo.hasNextPage }}",
+              "limitPagesFetched": true,
+              "maxRequests": 100,
+              "requestInterval": 250
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "pucmm-wordpress-api",
+          "name": "PUCMM WordPress API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "id": "6d361514d86edafb",
+      "name": "Normalizar y construir MJML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const crypto=require('crypto');const cfg=$('Configuración segura').first().json;const pages=name=>$(name).all().flatMap(i=>Array.isArray(i.json)?i.json:[i.json]);if(cfg.developmentMode!==true||cfg.testMode!==true)throw new Error('Prensa solo permite envíos de desarrollo a destinatarios de prueba');const stripDateline=v=>{const s=clean(v);return s.replace(/(^|[.!?…][\"”']?\\s+)(?:Santo\\s+Domingo|Santiago|Rep(?:u|ú)blica\\s+Dominicana)\\s*,?\\s*(?:R\\.?\\s*D\\.?)?\\s*[-–—:]+\\s*/gi,'$1').trim()};const truncate=(v,n)=>{const s=stripDateline(v);if(s.length<=n)return s;const marker=' ...';const budget=Math.max(0,n-marker.length);return (s.slice(0,budget+1).replace(/\\s+\\S*$/,'').trim()+marker).slice(0,n)};const pp=pages('Consultar Prensa paginada');const bp=pages('Consultar banners paginados');const unavailable=x=>x?.code||Number(x?.data?.status)>=500||/maintenance|unavailable|temporarily/i.test(String(x?.message||''));if(pp.some(unavailable)||bp.some(unavailable))throw new Error('WordPress Prensa/Agenda no disponible temporalmente');if(pp.some(x=>x.errors?.length)||bp.some(x=>x.errors?.length))throw new Error('GraphQL errors[]');const clean=v=>String(v??'').replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,' ').replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&amp;/gi,'&').replace(/&nbsp;/gi,' ').replace(/\\s+/g,' ').trim();const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[c]));const safe=(v,h)=>{const s=String(v||'').trim();if(!/^https:\\/\\/[^\\s<>\\x22\\x27]+$/i.test(s))return null;if(!h)return s;const prefix='https://'+h;return s===prefix||s.startsWith(prefix+'/')||s.startsWith(prefix+'?')||s.startsWith(prefix+'#')?s:null};const iso=v=>{const s=String(v||'');return /[zZ]|[+-]\\d\\d:\\d\\d$/.test(s)?new Date(s):new Date(s+'-04:00')};const raw=pp.flatMap(x=>x.data?.posts?.nodes||[]),invalid=[];const map=new Map();for(const x of raw){const dep=clean(x.opcionesPublicacion?.dependencia?.nodes?.[0]?.name);const d=iso(x.date);const a={id:String(x.databaseId||''),title:clean(x.title),publishedAt:d.toISOString(),url:safe(x.link,'prensa.pucmm.edu.do'),excerptText:truncate(x.excerpt||x.content,cfg.excerptMaxChars),imageUrl:safe(x.featuredImage?.node?.sourceUrl,'prensa.pucmm.edu.do'),imageAlt:clean(x.featuredImage?.node?.altText)||clean(x.title),categories:(x.categories?.nodes||[]).map(y=>({id:String(y.databaseId||''),name:clean(y.name),slug:clean(y.slug)})),campus:clean(x.opcionesPublicacion?.campus)||null,department:dep||null,portalPucmm:Boolean(x.opcionesPublicacion?.portalPucmm),segment:dep.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase()==='rectoria'?0:x.opcionesPublicacion?.portalPucmm?1:2};if(!a.id||!a.title||!a.url||Number.isNaN(d.valueOf())||d<new Date(cfg.windowStart)||d>=new Date(cfg.windowEndExclusive)){invalid.push(a.id);continue}if(!map.has(a.id))map.set(a.id,a)}const articles=[...map.values()].sort((a,b)=>a.segment-b.segment||b.publishedAt.localeCompare(a.publishedAt)||a.id.localeCompare(b.id));const now=new Date(cfg.referenceNow);const ads=bp.flatMap(x=>x.data?.banners?.nodes||[]).map(x=>({id:String(x.databaseId||''),title:clean(x.title),imageUrl:safe(x.featuredImage?.node?.sourceUrl,'dia.pucmm.edu.do'),imageAlt:clean(x.featuredImage?.node?.altText)||clean(x.title),targetUrl:safe(x.newsletter?.enlace),activeFrom:x.newsletter?.inicio,activeUntil:x.newsletter?.fin,priority:(()=>{const n=Number(x.priority??x.prioridad??x.newsletter?.priority??x.newsletter?.prioridad);return Number.isFinite(n)?n:0})()})).filter(x=>x.id&&x.imageUrl&&x.targetUrl&&(!x.activeFrom||new Date(x.activeFrom)<=now)&&(!x.activeUntil||now<new Date(x.activeUntil))).sort((a,b)=>b.priority-a.priority||String(b.activeFrom||'').localeCompare(String(a.activeFrom||''))||a.id.localeCompare(b.id)).slice(0,2);const blocks=[];const adSlots=new Map();if(articles.length&&ads[0])adSlots.set(0,[ads[0]]);if(ads[1]){const slot=Math.min(2,articles.length-1);adSlots.set(slot,(adSlots.get(slot)||[]).concat(ads[1]));}const renderAd=(a,showDivider=true)=>'<mj-wrapper padding=\"0px 30px\"><mj-section background-color=\"#ffffff\" padding=\"0\"><mj-column padding-left=\"10px\" padding-right=\"10px\" padding-top=\"0px\" padding-bottom=\"0px\"><mj-image border-radius=\"5px\" href=\"'+esc(a.targetUrl)+'\" src=\"'+esc(a.imageUrl)+'\" alt=\"'+esc(a.imageAlt||a.title)+'\" title=\"'+esc(a.title)+'\"/>'+(showDivider?'<mj-divider border-width=\"1px\" border-color=\"#f1f1f1\" padding=\"0\" align=\"center\" padding-left=\"30px\" padding-right=\"30px\" padding-top=\"30px\"/>':'')+'</mj-column></mj-section></mj-wrapper>';let bannerSeen=0;for(const [i,a] of articles.entries()){blocks.push('<mj-wrapper padding=\"0px 30px\"><mj-section background-color=\"#ffffff\" padding-bottom=\"8px\"><mj-column padding-left=\"10px\" padding-right=\"10px\">'+(a.imageUrl?'<mj-image border-radius=\"5px\" href=\"'+esc(a.url)+'\" src=\"'+esc(a.imageUrl)+'\" alt=\"'+esc(a.imageAlt||a.title)+'\" title=\"'+esc(a.title)+'\"/>':'')+'<mj-text font-family=\"Arial, Helvetica, sans-serif\" font-size=\"24px\" font-weight=\"600\" line-height=\"1.3\"><a href=\"'+esc(a.url)+'\" title=\"'+esc(a.title)+'\" aria-label=\"'+esc(a.title)+'\" style=\"text-decoration:none;color:#000000\">'+esc(a.title)+'</a></mj-text><mj-text font-family=\"Baskerville, Georgia, serif\" line-height=\"1.5\" font-size=\"15px\"><p style=\"margin:0px\">'+esc(a.excerptText)+' <a href=\"'+esc(a.url)+'\" style=\"color: #00369c; text-decoration: none;\" title=\"Leer más\"><b>Leer más</b></a></p></mj-text>'+(i<articles.length-1||(adSlots.get(i)||[]).length?'<mj-divider border-width=\"1px\" border-color=\"#f1f1f1\" padding=\"0\" align=\"center\" padding-left=\"30px\" padding-right=\"30px\" padding-top=\"20px\"/>':'')+'</mj-column></mj-section></mj-wrapper>');for(const ad of adSlots.get(i)||[]){bannerSeen++;blocks.push(renderAd(ad,i<articles.length-1||bannerSeen<ads.length));}}const key=crypto.createHash('sha256').update('internal-press|'+cfg.windowStart+'|'+cfg.windowEndExclusive+'|'+cfg.recipientGroup).digest('hex');const subject=(cfg.testMode?'[PRUEBA] ':'')+'📰 ¡Estas son las noticias de la PUCMM!';const test=cfg.testMode?'<mj-section background-color=\"#fff4b8\"><mj-column><mj-text align=\"center\"><b>[PRUEBA]</b> '+esc(cfg.windowStart)+' → '+esc(cfg.windowEndExclusive)+' · '+key.slice(0,12)+'</mj-text></mj-column></mj-section>':'';const header='<mj-wrapper padding=\"30px 30px 0px\"><mj-section padding=\"0\"><mj-column width=\"100%\" background-color=\"#ffffff\" border-radius=\"5px 5px 0 0\" padding=\"0 30px\"><mj-divider align=\"left\" width=\"30%\" border-color=\"#f1f1f1\" padding=\"0\" border-width=\"10px\"/></mj-column></mj-section><mj-section background-color=\"#00369c\"><mj-column width=\"35%\" vertical-align=\"middle\" padding=\"0\"><mj-image href=\"https://pucmm.edu.do\" width=\"240px\" src=\"'+esc(cfg.logoUrl)+'\" alt=\"Pontificia Universidad Católica Madre y Maestra\" title=\"PUCMM\"/></mj-column><mj-column width=\"65%\" vertical-align=\"middle\"><mj-text align=\"center\" color=\"#ffffff\" font-family=\"Baskerville\" padding=\"0\"><h1 style=\"font-size:30px;font-weight:600;line-height:1;\">Boletín PUCMM</h1><p style=\"font-size:12px;font-family:Arial,sans-serif;font-weight:300;line-height:1.2;\">Boletín Informativo · Dirección de Comunicaciones</p></mj-text></mj-column></mj-section><mj-section padding=\"0\"><mj-column width=\"100%\" background-color=\"#ffffff\" padding=\"0 30px\"><mj-divider align=\"left\" width=\"30%\" border-color=\"#F4D500\" padding=\"0\" border-width=\"10px\"/></mj-column></mj-section></mj-wrapper>';\nconst footer='<mj-section padding=\"0\"><mj-column width=\"100%\"><mj-text align=\"center\" line-height=\"1\"><p style=\"font-size:14px\">Unidad de Prensa | Dirección de Comunicaciones</p><p>Pontificia Universidad Católica Madre y Maestra</p><p style=\"font-size:12px\">Desarrollado por Comunicación Digital</p></mj-text></mj-column></mj-section><mj-section padding=\"0\"><mj-group width=\"60%\"><mj-column><mj-social><mj-social-element name=\"instagram\" href=\"https://www.instagram.com/pucmm\"/></mj-social></mj-column><mj-column><mj-social><mj-social-element name=\"facebook\" href=\"https://www.facebook.com/pucmm/\"/></mj-social></mj-column><mj-column><mj-social><mj-social-element name=\"youtube\" href=\"https://www.youtube.com/pucmmtv/\"/></mj-social></mj-column><mj-column><mj-social><mj-social-element name=\"x\" href=\"https://twitter.com/pucmm/\"/></mj-social></mj-column><mj-column><mj-social><mj-social-element name=\"linkedin\" href=\"https://www.linkedin.com/edu/school?id=12020\"/></mj-social></mj-column></mj-group></mj-section>';\nconst closing='<mj-wrapper padding=\"0px 30px\"><mj-section background-color=\"#ffffff\" padding-bottom=\"30px\" border-radius=\"0 0 5px 5px\"></mj-section></mj-wrapper>';\nconst preview=(articles.length?'Noticias y novedades de la PUCMM · '+articles[0].title:'Noticias y novedades de la PUCMM').slice(0,160);const mjml='<mjml><mj-head><mj-title>'+esc(subject)+'</mj-title><mj-preview>'+esc(preview)+'</mj-preview><mj-breakpoint width=\"575px\"/><mj-font name=\"Baskerville\" href=\"https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap\"/><mj-style inline=\"inline\">.row{padding:10px 0}</mj-style></mj-head><mj-body width=\"980px\" background-color=\"#f0f0f0\">'+test+header+blocks.join('')+closing+footer+'</mj-body></mjml>';const recipients=cfg.testMode?cfg.emailTestRecipients:cfg.emailTo;if(cfg.testMode&&!recipients)throw new Error('TEST_MODE requiere destinatario');return [{json:{...cfg,articles,banners:ads,activityCount:articles.length,articleCount:articles.length,adCount:ads.length,invalidCount:invalid.length,executionKey:key,subject,mjml,recipients,shouldSend:articles.length>0,startedAt:new Date().toISOString()}}];"
+      }
+    },
+    {
+      "id": "024d8b201bfbfd0c",
+      "name": "¿Debe enviar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        100,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.shouldSend }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e02c5362685bd720",
+      "name": "Compilar MJML reutilizable",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        300,
+        -80
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "73pz6aMDSOoMOrBr"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contractVersion": 1,
+            "mjml": "={{ $json.mjml }}",
+            "correlationId": "={{ $json.executionKey }}",
+            "context": "={{ $json }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "7d27bd41b892e8b4",
+      "name": "Enviar SMTP reutilizable",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        740,
+        0
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "apJmJfvec2P8KOG7"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contractVersion": 1,
+            "testMode": "={{ $json.testMode }}",
+            "fromEmail": "={{ $json.emailFrom }}",
+            "fromName": "={{ $json.emailFromName }}",
+            "replyTo": "={{ $json.emailReplyTo }}",
+            "toEmail": "={{ $json.recipients }}",
+            "allowedDomains": "={{ $json.allowedDomains.split(',') }}",
+            "subject": "={{ $json.subject }}",
+            "html": "={{ $json.html }}",
+            "dataTableId": "={{ $json.dataTableId }}",
+            "idempotencyKey": "={{ ($json.forceResend ? $json.executionKey + '|smtp|force|' + $execution.id : $json.executionKey + '|smtp') + ($json.testMode ? '|test' : '|production') }}",
+            "recipientGroup": "={{ $json.recipientGroup }}",
+            "digestType": "={{ $json.digestType }}",
+            "windowStart": "={{ $json.windowStart }}",
+            "windowEndExclusive": "={{ $json.windowEndExclusive }}",
+            "activityCount": "={{ $json.articleCount }}",
+            "adCount": "={{ $json.adCount }}",
+            "invalidCount": "={{ $json.invalidCount }}",
+            "startedAt": "={{ $json.startedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    },
+    {
+      "id": "dddc696bc4f83bc3",
+      "name": "¿Transporte Brevo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        740,
+        120
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.emailTransport }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "rightValue": "brevo"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "98398e36b5fb2104",
+      "name": "Enviar Brevo reutilizable",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        980,
+        120
+      ],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "SklCy2UMq5G0elbg"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contractVersion": 1,
+            "testMode": "={{ $json.testMode }}",
+            "name": "={{ ($json.testMode ? '[PRUEBA] ' : '') + 'Boletín Prensa ' + $now.setZone('America/Santo_Domingo').toFormat('yyyy-MM-dd') }}",
+            "tag": "={{ ($json.testMode ? 'Prueba Boletín Prensa ' : 'Boletín Prensa ') + $now.setZone('America/Santo_Domingo').toFormat('yyyy-MM-dd') }}",
+            "subject": "={{ $json.subject }}",
+            "html": "={{ $json.html }}",
+            "senderId": 1,
+            "replyTo": "={{ $json.emailReplyTo }}",
+            "listIds": "={{ $json.testMode ? [116] : [2,4,146,160,164,165,170,189,190] }}",
+            "dataTableId": "={{ $json.dataTableId }}",
+            "idempotencyKey": "={{ ($json.forceResend ? $json.executionKey + '|brevo|force|' + $execution.id : $json.executionKey + '|brevo') + ($json.testMode ? '|test' : '|production') }}",
+            "recipientGroup": "={{ $json.testMode ? 'brevo_list_116_test' : 'brevo_lists_2_4_146_160_164_165_170_189_190' }}",
+            "digestType": "={{ $json.digestType || 'monthly' }}",
+            "windowStart": "={{ $json.windowStart }}",
+            "windowEndExclusive": "={{ $json.windowEndExclusive }}",
+            "activityCount": "={{ $json.articleCount }}",
+            "adCount": "={{ $json.adCount }}",
+            "invalidCount": "={{ $json.invalidCount }}",
+            "startedAt": "={{ $json.startedAt }}",
+            "testEmails": "={{ $json.emailTestRecipients }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Entrada del boletín": {
+      "main": [
+        [
+          {
+            "node": "Configuración segura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuración segura": {
+      "main": [
+        [
+          {
+            "node": "Preparar consultas GraphQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar consultas GraphQL": {
+      "main": [
+        [
+          {
+            "node": "Consultar Prensa paginada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Prensa paginada": {
+      "main": [
+        [
+          {
+            "node": "Consultar banners paginados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar banners paginados": {
+      "main": [
+        [
+          {
+            "node": "Normalizar y construir MJML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar y construir MJML": {
+      "main": [
+        [
+          {
+            "node": "¿Debe enviar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Debe enviar?": {
+      "main": [
+        [
+          {
+            "node": "Compilar MJML reutilizable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Compilar MJML reutilizable": {
+      "main": [
+        [
+          {
+            "node": "¿Transporte Brevo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Transporte Brevo?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Brevo reutilizable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar SMTP reutilizable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "availableInMCP": true,
+    "errorWorkflow": "bbb56f7efb469be8"
+  },
+  "versionId": "00000000-0000-4000-8000-000000000003",
+  "tags": [
+    {
+      "id": "E5zpZbg1ZklwhBHC",
+      "name": "tipo:orquestador"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "sccWLLXBXISqqhz6",
+      "name": "canal:brevo"
+    },
+    {
+      "id": "vWtTfSH6USLlhmO4",
+      "name": "formato:mjml"
+    }
+  ]
+}

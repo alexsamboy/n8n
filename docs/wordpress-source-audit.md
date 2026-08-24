@@ -3,6 +3,9 @@
 Fecha: 2026-08-20  
 Zona horaria de negocio: `America/Santo_Domingo`
 
+> Este documento incluye al final la auditoría diferenciada de Prensa PUCMM
+> realizada el 2026-08-21.
+
 ## Resumen
 
 La fuente viable es WPGraphQL en `https://dia.pucmm.edu.do/graphql`.
@@ -118,6 +121,14 @@ habiliten o documenten, usar `placement=null`, `priority=0` y ordenar por ID
 ascendente como desempate estable. Seleccionar como máximo dos anuncios tras
 filtrar vigencia y validar ambas URL HTTPS.
 
+El orquestador de Prensa no ignora una prioridad si el origen la entrega en
+una respuesta extendida: normaliza `priority`, `prioridad`,
+`newsletter.priority` o `newsletter.prioridad` como número y ordena por
+prioridad descendente, luego `activeFrom` descendente e ID ascendente. Con el
+esquema público actualmente verificado esos campos no llegan y el valor
+seguro permanece en cero; no se añadió un campo GraphQL no confirmado que
+pueda romper la consulta.
+
 ## Paginación y filtros
 
 - Tamaño previsto: `first: 100`.
@@ -146,3 +157,26 @@ Las respuestas temporales de auditoría se guardaron fuera del repositorio en
 `/tmp`. No se guardaron títulos, contactos, credenciales ni cuerpos completos
 en este documento. Se comprobó una muestra de tres actividades y tres banners,
 además de un filtro de solapamiento de agosto de 2026.
+
+## Fuente Prensa PUCMM (2026-08-21)
+
+- GraphQL: `https://prensa.pucmm.edu.do/graphql`.
+- REST root: deshabilitado públicamente con `403 forbidden_root`.
+- `RootQuery.posts`: requiere autenticación; la introspección pública también
+  está deshabilitada.
+- La validación del esquema confirmó `posts(first, after, where.dateQuery)`,
+  `pageInfo { hasNextPage endCursor }`, `databaseId`, `title`, `date`, `link`,
+  `content`, imagen destacada, categorías y
+  `opcionesPublicacion { portalPucmm campus dependencia { nodes { databaseId name slug } } }`.
+- `excerpt` no existe en el tipo `Post`; se usa `content` convertido a texto.
+- La credencial n8n `Prensa PUCMM Wordpress API` fue validada sin exponer sus
+  valores. Una consulta autenticada de tres publicaciones confirmó contenido,
+  imagen, categorías y opciones editoriales, además de `hasNextPage=true`.
+- `date` llega como hora civil sin offset (por ejemplo,
+  `2026-08-19T14:51:41`); debe interpretarse en `America/Santo_Domingo`, no
+  como UTC, y filtrarse otra vez contra la ventana subdiaria exacta.
+
+Para banners se confirmó públicamente que `newsletter { inicio fin enlace }`
+existe. No existen dentro de `Newsletter` los campos `prioridad`, `canales` ni
+`ubicacion`; se aplica prioridad cero y desempate estable. Una muestra limitada
+confirmó fechas ISO, imágenes y enlaces HTTPS, sin conservar contenido en Git.

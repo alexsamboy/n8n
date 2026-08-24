@@ -1,0 +1,313 @@
+{
+  "id": "apJmJfvec2P8KOG7",
+  "name": "LIB — Mensajería — Enviar SMTP",
+  "nodes": [
+    {
+      "id": "9799bd8e-3640-4b74-91c6-13157a9f30fc",
+      "name": "Entrada de envío SMTP",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "contractVersion",
+              "type": "number"
+            },
+            {
+              "name": "testMode",
+              "type": "boolean"
+            },
+            {
+              "name": "fromEmail",
+              "type": "string"
+            },
+            {
+              "name": "fromName",
+              "type": "string"
+            },
+            {
+              "name": "replyTo",
+              "type": "string"
+            },
+            {
+              "name": "toEmail",
+              "type": "string"
+            },
+            {
+              "name": "allowedDomains",
+              "type": "array"
+            },
+            {
+              "name": "subject",
+              "type": "string"
+            },
+            {
+              "name": "html",
+              "type": "string"
+            },
+            {
+              "name": "dataTableId",
+              "type": "string"
+            },
+            {
+              "name": "idempotencyKey",
+              "type": "string"
+            },
+            {
+              "name": "recipientGroup",
+              "type": "string"
+            },
+            {
+              "name": "digestType",
+              "type": "string"
+            },
+            {
+              "name": "windowStart",
+              "type": "string"
+            },
+            {
+              "name": "windowEndExclusive",
+              "type": "string"
+            },
+            {
+              "name": "activityCount",
+              "type": "number"
+            },
+            {
+              "name": "adCount",
+              "type": "number"
+            },
+            {
+              "name": "invalidCount",
+              "type": "number"
+            },
+            {
+              "name": "startedAt",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "6f7cdb22-31c5-4e1e-ba55-d89dbe743177",
+      "name": "Validar entrada SMTP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const x=$json;if(Number(x.contractVersion)!==1)throw new Error('contractVersion SMTP no soportada');for(const f of ['fromEmail','fromName','replyTo','toEmail','subject','html','dataTableId','idempotencyKey','recipientGroup','digestType','windowStart','windowEndExclusive'])if(typeof x[f]!=='string'||!x[f].trim())throw new Error('SMTP requiere '+f);const email=/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;if(!email.test(x.fromEmail.trim())||!email.test(x.replyTo.trim()))throw new Error('Remitente o replyTo SMTP inválido');const recipients=[...new Set(x.toEmail.split(/[;,]/).map(v=>v.trim()).filter(Boolean))];if(!recipients.length||recipients.some(v=>!email.test(v)))throw new Error('Destinatarios SMTP inválidos');const allowed=[...new Set((Array.isArray(x.allowedDomains)?x.allowedDomains:[]).map(v=>String(v).trim().toLowerCase()).filter(Boolean))];if(allowed.length&&recipients.some(v=>!allowed.includes(v.split('@')[1].toLowerCase())))throw new Error('Destinatario SMTP fuera de dominios permitidos');if(!x.html.toLowerCase().includes('<html'))throw new Error('SMTP requiere HTML compilado');const startedAt=typeof x.startedAt==='string'&&!Number.isNaN(new Date(x.startedAt).valueOf())?x.startedAt:new Date().toISOString();return [{json:{...x,contractVersion:1,testMode:Boolean(x.testMode),fromEmail:x.fromEmail.trim(),fromName:x.fromName.trim(),replyTo:x.replyTo.trim(),toEmail:recipients.join(','),allowedDomains:allowed,subject:x.subject.trim(),dataTableId:x.dataTableId.trim(),idempotencyKey:x.idempotencyKey.trim(),recipientGroup:x.recipientGroup.trim(),digestType:x.digestType.trim(),activityCount:Number(x.activityCount)||0,adCount:Number(x.adCount)||0,invalidCount:Number(x.invalidCount)||0,recipientCount:recipients.length,startedAt}}];"
+      }
+    },
+    {
+      "id": "07b4a383-ef55-42ae-bc20-a3de7b623fac",
+      "name": "Verificar idempotencia SMTP",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "rowNotExists",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.dataTableId }}"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "execution_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "8d77b741-3152-4e2f-a5c9-dfad21378145",
+      "name": "Enviar correo SMTP",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        0
+      ],
+      "parameters": {
+        "operation": "send",
+        "fromEmail": "={{ $json.fromName + ' <' + $json.fromEmail + '>' }}",
+        "toEmail": "={{ $json.toEmail }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {
+          "replyTo": "={{ $json.replyTo }}",
+          "appendAttribution": false
+        }
+      },
+      "webhookId": "2d11ffaa-a2cf-409c-90cb-b43ef0b333bf",
+      "credentials": {
+        "smtp": {
+          "id": "pucmm-agenda-smtp",
+          "name": "PUCMM Agenda SMTP"
+        }
+      }
+    },
+    {
+      "id": "361e2ac9-9c01-4273-b975-f90c123e1126",
+      "name": "Registrar envío SMTP",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "insert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Validar entrada SMTP').item.json.dataTableId }}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_key": "={{ $('Validar entrada SMTP').item.json.idempotencyKey }}",
+            "digest_type": "={{ $('Validar entrada SMTP').item.json.digestType }}",
+            "window_start": "={{ $('Validar entrada SMTP').item.json.windowStart }}",
+            "window_end": "={{ $('Validar entrada SMTP').item.json.windowEndExclusive }}",
+            "recipient_group": "={{ $('Validar entrada SMTP').item.json.recipientGroup }}",
+            "status": "sent",
+            "message_id": "={{ $json.id || $json.messageId || \"\" }}",
+            "sent_at": "={{ $now.toISO() }}",
+            "activity_count": "={{ $('Validar entrada SMTP').item.json.activityCount }}",
+            "ad_count": "={{ $('Validar entrada SMTP').item.json.adCount }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "033eeb6e-4f28-4249-b753-7af4b2b34e8d",
+      "name": "Resultado SMTP sanitizado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const s=$('Validar entrada SMTP').item.json;return [{json:{contractVersion:1,status:'sent',transport:'smtp',digestType:s.digestType,windowStart:s.windowStart,windowEndExclusive:s.windowEndExclusive,activityCount:s.activityCount,adCount:s.adCount,invalidCount:s.invalidCount,recipientCount:s.recipientCount,messageId:$json.message_id||null,durationMs:Date.now()-new Date(s.startedAt).valueOf(),idempotencyKey:s.idempotencyKey}}];"
+      }
+    }
+  ],
+  "connections": {
+    "Entrada de envío SMTP": {
+      "main": [
+        [
+          {
+            "node": "Validar entrada SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar entrada SMTP": {
+      "main": [
+        [
+          {
+            "node": "Verificar idempotencia SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar idempotencia SMTP": {
+      "main": [
+        [
+          {
+            "node": "Enviar correo SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar correo SMTP": {
+      "main": [
+        [
+          {
+            "node": "Registrar envío SMTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar envío SMTP": {
+      "main": [
+        [
+          {
+            "node": "Resultado SMTP sanitizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "timezone": "America/Santo_Domingo",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "09f42f99-4586-42eb-bb91-8cf0f5a1c991",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "tags": [
+    {
+      "id": "BTfTdVEf6F9VUKXG",
+      "name": "tipo:libreria"
+    },
+    {
+      "id": "DzmV2fcf1K2eL11w",
+      "name": "canal:smtp"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
+    }
+  ],
+  "description": "Envía HTML por SMTP con contrato v1, validación de destinatarios y dominios, idempotencia, auditoría en Data Table y métricas sanitizadas."
+}

@@ -1,7 +1,6 @@
 {
   "id": "848f824105bbf077",
-  "name": "Agenda PUCMM — monthly",
-  "description": "Programa el boletín mensual de Agenda PUCMM y coordina el envío interno y la campaña de Aliados en Brevo mediante el workflow central.",
+  "name": "APP — Agenda PUCMM — Mensual",
   "nodes": [
     {
       "id": "agenda-001",
@@ -116,12 +115,23 @@
   },
   "versionId": "a071eca8-0e20-4c25-92f0-e5cfa9bcd7da",
   "meta": {
-    "templateCredsSetupCompleted": false
+    "templateCredsSetupCompleted": false,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
   },
   "tags": [
     {
-      "id": "agenda-pucmm",
-      "name": "Agenda PUCMM"
+      "id": "v1sDNPSmEjCPe4Uz",
+      "name": "app:agenda-pucmm"
+    },
+    {
+      "id": "FpkNzlfnIlv0vKKm",
+      "name": "tipo:coordinador"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
     }
-  ]
+  ],
+  "description": "Programa el boletín mensual de Agenda PUCMM y coordina el envío interno y la campaña de Aliados en Brevo mediante el workflow central."
 }

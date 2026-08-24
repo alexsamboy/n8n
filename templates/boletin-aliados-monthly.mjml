@@ -1,0 +1,24 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{subject}}</mj-title>
+    <mj-preview>{{previewText}}</mj-preview>
+    <mj-breakpoint width="575px"/>
+    <mj-font name="Libre Baskerville" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap"/>
+  </mj-head>
+  <mj-body width="800px" background-color="#f1f1f1">
+    <mj-wrapper full-width="full-width" padding="0" background-color="#00369c">
+      <mj-section background-color="#00369c">
+        <mj-column width="30%"><mj-image href="https://pucmm.edu.do" width="210px" src="{{logoUrl}}" alt="Pontificia Universidad Católica Madre y Maestra"/></mj-column>
+        <mj-column width="70%"><mj-text align="center" color="#ffffff" font-family="Libre Baskerville, Georgia, serif"><h1>Prensa PUCMM</h1><p>Boletín para Aliados · Dirección de Comunicaciones</p></mj-text></mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-wrapper full-width="full-width" padding="20px">
+      <mj-section background-color="#ffffff" border-radius="6px 6px 0 0">
+        <mj-column><mj-text align="center" line-height="1.5"><h2>Noticias PUCMM</h2>{{intro}}</mj-text><mj-divider border-color="#F4D500" border-width="3px"/></mj-column>
+      </mj-section>
+      {{articles}}
+      <mj-section background-color="#ffffff"><mj-column><mj-button background-color="#F4D500" color="#111111" href="{{pressUrl}}">Ver todas las noticias</mj-button></mj-column></mj-section>
+      <mj-section background-color="#f7f7f7" border-radius="0 0 6px 6px"><mj-column><mj-text align="center" font-size="13px">Pontificia Universidad Católica Madre y Maestra<br/>Dirección de Comunicaciones</mj-text></mj-column></mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

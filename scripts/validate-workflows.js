@@ -3,15 +3,24 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const directory = path.join(__dirname, "..", "workflows", "pucmm");
+const directory = path.join(__dirname, "..", "workflows");
 const expected = [
-  "agenda-daily.json",
-  "agenda-weekly.json",
-  "agenda-monthly.json",
-  "agenda-build-send.json",
-  "agenda-error-handler.json",
-  "lib-compile-mjml.json",
-  "lib-brevo-campaign.json",
+  "apps/agenda-pucmm/coordinators/daily.json",
+  "apps/agenda-pucmm/coordinators/weekly.json",
+  "apps/agenda-pucmm/coordinators/monthly.json",
+  "apps/agenda-pucmm/orchestration/build-send-digest.json",
+  "apps/agenda-pucmm/operations/error-handler.json",
+  "libraries/messaging/compile-mjml.json",
+  "libraries/messaging/brevo-campaign.json",
+  "libraries/messaging/send-smtp.json",
+  "apps/boletin-interno-prensa/coordination/scheduler.json",
+  "apps/boletin-interno-prensa/coordination/monthly.json",
+  "apps/boletin-interno-prensa/orchestration/build-send.json",
+  "apps/boletin-interno-prensa/operations/error-handler.json",
+  "apps/boletin-aliados/coordinators/monthly.json",
+  "apps/boletin-aliados/orchestration/build-send-campaign.json",
+  "apps/boletin-aliados/operations/error-handler.json",
+  "apps/boletin-aliados/operations/campaign-report.json",
 ];
 let failed = false;
 for (const file of expected) {
@@ -24,8 +33,8 @@ for (const file of expected) {
   const unsupported = workflow.nodes.filter((node) => node.type === "n8n-nodes-base.microsoftOutlook" && node.typeVersion !== 2);
   const envAccess = JSON.stringify(workflow).includes("$env.");
   const wordpressNodes = workflow.nodes.filter((node) => ["Consultar actividades autenticadas", "Consultar banners autenticados"].includes(node.name));
-  const wordpressCredentialsOk = file !== "agenda-build-send.json" || (wordpressNodes.length === 2 && wordpressNodes.every((node) => node.credentials?.httpBasicAuth?.id === "pucmm-wordpress-api" && node.parameters?.options?.pagination?.pagination?.limitPagesFetched === true));
-  const isLibrary = file.startsWith("lib-");
+  const wordpressCredentialsOk = !file.endsWith("/build-send-digest.json") || (wordpressNodes.length === 2 && wordpressNodes.every((node) => node.credentials?.httpBasicAuth?.id === "pucmm-wordpress-api" && node.parameters?.options?.pagination?.pagination?.limitPagesFetched === true));
+  const isLibrary = file.startsWith("libraries/");
   const activationOk = workflow.active === isLibrary;
   const ok = activationOk && workflow.settings.timezone === "America/Santo_Domingo" && missing.length === 0 && credentialValues.length === 0 && unsupported.length === 0 && !envAccess && wordpressCredentialsOk;
   console.log(`${ok ? "OK" : "FAIL"} ${file}: nodes=${workflow.nodes.length} active=${workflow.active} missingTargets=${missing.length} unsupportedVersions=${unsupported.length} envAccess=${envAccess}`);

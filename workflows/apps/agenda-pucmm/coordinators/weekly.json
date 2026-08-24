@@ -1,7 +1,6 @@
 {
   "id": "d853924eed377ab6",
-  "name": "Agenda PUCMM — weekly",
-  "description": "Programa el boletín semanal de Agenda PUCMM, calcula el período correspondiente y delega su construcción y envío al workflow central.",
+  "name": "APP — Agenda PUCMM — Semanal",
   "nodes": [
     {
       "id": "agenda-001",
@@ -116,12 +115,23 @@
   },
   "versionId": "574dfe4f-5cd8-4917-aa77-71a5876e6492",
   "meta": {
-    "templateCredsSetupCompleted": false
+    "templateCredsSetupCompleted": false,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
   },
   "tags": [
     {
-      "id": "agenda-pucmm",
-      "name": "Agenda PUCMM"
+      "id": "v1sDNPSmEjCPe4Uz",
+      "name": "app:agenda-pucmm"
+    },
+    {
+      "id": "FpkNzlfnIlv0vKKm",
+      "name": "tipo:coordinador"
+    },
+    {
+      "id": "bs7AihnKkvaty5oC",
+      "name": "estado:produccion"
     }
-  ]
+  ],
+  "description": "Programa el boletín semanal de Agenda PUCMM, calcula el período correspondiente y delega su construcción y envío al workflow central."
 }
