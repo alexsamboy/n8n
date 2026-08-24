@@ -27,6 +27,28 @@ desarrollo: fuerza `testMode=true` y solo permite el destinatario de pruebas
 No existe una rama `dryRun` dentro del orquestador; una ejecución manual solo
 puede enviar a esa dirección de prueba.
 
+La salida dinámica usa la plantilla base de Prensa: `mj-body` de 980 px,
+cabecera con divisores institucionales, artículos uniformes (imagen opcional
+redondeada, categoría/fecha, título sans-serif de 24 px, resumen Baskerville
+de 15 px y enlace «Leer más»), banners prioritarios, CTA, footer de Prensa y
+redes sociales HTTPS. La selección y las posiciones de anuncios se calculan
+antes de construir el MJML; con una sola noticia ambos anuncios, si existen,
+se colocan después de esa noticia sin perder ninguno.
+
+Los resúmenes prefieren `excerpt` cuando una fuente lo entrega y usan
+`content` como fallback. En el esquema autenticado actual de WPGraphQL de
+Prensa, `Post` no expone `excerpt`, por lo que actualmente se normaliza
+`content`. Antes de truncar se eliminan datelines como `Santo Domingo, R.D.-`,
+`Santiago, R.D.–` y `República Dominicana -`, incluso cuando aparecen después
+de una oración. Los resúmenes truncados terminan en ` ...`. El preheader
+(`mj-preview`) muestra “Noticias y novedades de la PUCMM” y, cuando hay
+artículos, incorpora el título de la primera noticia.
+
+El asunto es `📰 ¡Estas son las noticias de la PUCMM!` (con `[PRUEBA]` solo en
+modo de desarrollo). Las imágenes incluyen `alt` y `title` descriptivos; el
+último artículo y el último banner omiten su divisor cuando no tienen contenido
+posterior.
+
 En la instancia actual, el orquestador y el manejador están publicados porque
 `Execute Workflow` requiere una versión publicada. No tienen disparador
 autónomo. El coordinador sigue inactivo.

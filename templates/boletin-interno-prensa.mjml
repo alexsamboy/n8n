@@ -1,23 +1,24 @@
 <mjml>
   <mj-head>
-    <mj-title>{{SUBJECT}}</mj-title><mj-preview>{{PREHEADER}}</mj-preview>
+    <mj-title>{{SUBJECT}}</mj-title>
+    <mj-preview>{{PREHEADER}}</mj-preview>
     <mj-breakpoint width="575px" />
-    <mj-font name="Libre Baskerville" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&amp;display=swap" />
-    <mj-font name="Libre Franklin" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600&amp;display=swap" />
-    <mj-attributes><mj-all font-family="Libre Franklin, Arial, sans-serif"/><mj-text color="#222222" font-size="15px" line-height="1.55"/></mj-attributes>
-    <mj-style inline="inline">.headline a{color:#111111!important;text-decoration:none!important}.test-banner div{background:#fff4b8;color:#5b4700!important}</mj-style>
+    <mj-font name="Baskerville" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" />
+    <mj-style inline="inline">.row{padding:10px 0}</mj-style>
   </mj-head>
-  <mj-body width="800px" background-color="#f1f1f1">
+  <mj-body width="980px" background-color="#f0f0f0">
     {{TEST_BANNER}}
-    <mj-wrapper padding="0" background-color="#00369c">
-      <mj-section padding="20px 28px"><mj-column width="30%" vertical-align="middle"><mj-image href="https://pucmm.edu.do/" src="{{LOGO_URL}}" alt="Pontificia Universidad Católica Madre y Maestra" width="210px" /></mj-column><mj-column width="70%" vertical-align="middle"><mj-text align="center" color="#ffffff" font-family="Libre Baskerville, Georgia, serif" padding="0"><h1 style="font-size:30px;line-height:1.1;margin:0">Prensa PUCMM</h1><p style="font-family:Arial,sans-serif;font-size:14px;margin:8px 0 0">Boletín Informativo · Dirección de Comunicaciones</p></mj-text></mj-column></mj-section>
-      <mj-section background-color="#F4D500" padding="3px"><mj-column><mj-spacer height="1px" /></mj-column></mj-section>
+    <mj-wrapper padding="30px 30px 0px">
+      <mj-section padding="0"><mj-column width="100%" background-color="#ffffff" border-radius="5px 5px 0 0" padding="0 30px"><mj-divider align="left" width="30%" border-color="#f1f1f1" padding="0" border-width="10px" /></mj-column></mj-section>
+      <mj-section background-color="#00369c">
+        <mj-column width="35%" vertical-align="middle" padding="0"><mj-image href="https://pucmm.edu.do" width="240px" src="{{LOGO_URL}}" alt="Pontificia Universidad Católica Madre y Maestra" title="PUCMM" /></mj-column>
+        <mj-column width="65%" vertical-align="middle"><mj-text align="center" color="#ffffff" font-family="Baskerville" padding="0"><h1 style="font-size:30px;font-weight:600;line-height:1;">Boletín PUCMM</h1><p style="font-size:12px;font-family:Arial,sans-serif;font-weight:300;line-height:1.2;">Boletín Informativo · Dirección de Comunicaciones</p></mj-text></mj-column>
+      </mj-section>
+      <mj-section padding="0"><mj-column width="100%" background-color="#ffffff" padding="0 30px"><mj-divider align="left" width="30%" border-color="#F4D500" padding="0" border-width="10px" /></mj-column></mj-section>
     </mj-wrapper>
-    <mj-wrapper padding="20px" background-color="#f1f1f1">
-      <mj-section background-color="#ffffff" border-radius="6px 6px 0 0" padding="24px 28px 12px"><mj-column><mj-text align="center"><h2 style="font-family:Libre Baskerville,Georgia,serif;margin:0">Noticias PUCMM</h2><p>Información institucional publicada entre {{WINDOW_START}} y {{WINDOW_END}}.</p></mj-text></mj-column></mj-section>
-      {{CONTENT}}
-      <mj-section background-color="#ffffff" padding="22px"><mj-column><mj-button background-color="#F4D500" color="#111111" font-weight="600" href="{{PRESS_URL}}">Ver todas las noticias</mj-button></mj-column></mj-section>
-      <mj-section background-color="#f7f7f7" border-radius="0 0 6px 6px"><mj-column><mj-text align="center"><b>Pontificia Universidad Católica Madre y Maestra</b><br/>Dirección de Comunicaciones<br/>Santiago · Santo Domingo</mj-text><mj-social align="center" icon-size="24px"><mj-social-element name="instagram" href="https://www.instagram.com/pucmm"/><mj-social-element name="facebook" href="https://www.facebook.com/pucmm/"/><mj-social-element name="youtube" href="https://www.youtube.com/pucmmtv/"/><mj-social-element name="linkedin" href="https://www.linkedin.com/edu/school?id=12020"/></mj-social></mj-column></mj-section>
-    </mj-wrapper>
+    {{CONTENT}}
+    <mj-wrapper padding="0px 30px"><mj-section background-color="#ffffff" padding-bottom="30px" border-radius="0px 0px 5px 5px"></mj-section></mj-wrapper>
+    <mj-section padding="0"><mj-column width="100%"><mj-text align="center" line-height="1"><p style="font-size:14px">Unidad de Prensa | Dirección de Comunicaciones</p><p>Pontificia Universidad Católica Madre y Maestra</p><p style="font-size:12px">Desarrollado por Comunicación Digital</p></mj-text></mj-column></mj-section>
+    <mj-section padding="0"><mj-group width="60%"><mj-column><mj-social><mj-social-element name="instagram" href="https://www.instagram.com/pucmm" /></mj-social></mj-column><mj-column><mj-social><mj-social-element name="facebook" href="https://www.facebook.com/pucmm/" /></mj-social></mj-column><mj-column><mj-social><mj-social-element name="youtube" href="https://www.youtube.com/pucmmtv/" /></mj-social></mj-column><mj-column><mj-social><mj-social-element name="x" href="https://twitter.com/pucmm/" /></mj-social></mj-column><mj-column><mj-social><mj-social-element name="linkedin" href="https://www.linkedin.com/edu/school?id=12020" /></mj-social></mj-column></mj-group></mj-section>
   </mj-body>
 </mjml>

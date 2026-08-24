@@ -15,11 +15,19 @@ function cleanText(value) {
     }).replace(/\s+/g, " ").trim() || null;
 }
 
-function truncateText(value, max = 320) {
+function stripDatelinePrefix(value) {
   const text = cleanText(value);
+  if (!text) return text;
+  return text.replace(/(^|[.!?…]["”']?\s+)(?:Santo\s+Domingo|Santiago|Rep(?:u|ú)blica\s+Dominicana)\s*,?\s*(?:R\.?\s*D\.?)?\s*[-–—:]+\s*/gi, "$1").trim() || null;
+}
+
+function truncateText(value, max = 320) {
+  const text = stripDatelinePrefix(value);
   if (!text || text.length <= max) return text;
-  const cut = text.slice(0, max + 1).replace(/\s+\S*$/, "").trim();
-  return `${cut || text.slice(0, max).trim()}…`;
+  const marker = " ...";
+  const budget = Math.max(0, max - marker.length);
+  const cut = text.slice(0, budget + 1).replace(/\s+\S*$/, "").trim();
+  return `${(cut || text.slice(0, budget).trim())}${marker}`.slice(0, max);
 }
 
 function httpsUrl(value, allowedHosts = []) {
@@ -83,7 +91,7 @@ function normalizeBanner(node) {
   return { id: String(node?.databaseId || ""), title: cleanText(node?.title),
     imageUrl: httpsUrl(node?.featuredImage?.node?.sourceUrl, ["dia.pucmm.edu.do"]),
     imageAlt: cleanText(node?.featuredImage?.node?.altText) || cleanText(node?.title),
-    targetUrl: httpsUrl(node?.newsletter?.enlace), priority: Number(node?.newsletter?.priority || 0),
+    targetUrl: httpsUrl(node?.newsletter?.enlace), priority: Number(node?.priority ?? node?.prioridad ?? node?.newsletter?.priority ?? node?.newsletter?.prioridad ?? 0),
     activeFrom: node?.newsletter?.inicio || null, activeUntil: node?.newsletter?.fin || null };
 }
 
@@ -107,4 +115,4 @@ function interleave(articles, banners) {
 function executionKey(start, end, group) { return crypto.createHash("sha256").update(`internal-press|${start}|${end}|${group}`).digest("hex"); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
-module.exports = { ZONE, OFFSET, cleanText, truncateText, httpsUrl, fallbackWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };
+module.exports = { ZONE, OFFSET, cleanText, stripDatelinePrefix, truncateText, httpsUrl, fallbackWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };
