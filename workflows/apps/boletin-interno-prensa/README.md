@@ -51,7 +51,14 @@ posterior.
 
 En la instancia actual, el orquestador y el manejador están publicados porque
 `Execute Workflow` requiere una versión publicada. No tienen disparador
-autónomo. El coordinador sigue inactivo.
+autónomo. Los coordinadores se activan únicamente en la instancia de n8n;
+los JSON del repositorio permanecen `active=false` para importación segura.
+
+Producción: los coordinadores diario y mensual fueron activados en n8n el
+24 de agosto de 2026. El horario programado usa destinatarios productivos;
+las rutas de prueba manual conservan `testMode=true`, `developmentMode=true`
+y el correo de prueba institucional. El contenedor n8n fue reiniciado para
+cargar los cron activos.
 
 ## Importación segura
 
