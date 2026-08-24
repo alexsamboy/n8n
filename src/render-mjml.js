@@ -30,7 +30,7 @@ function renderMjml(data, templatePath = path.join(__dirname, "..", "templates",
   const top = data.ads.find((ad) => ad.resolvedPlacement === "top");
   const bottom = data.ads.find((ad) => ad.resolvedPlacement === "bottom");
   const replacements = {
-    SUBJECT: escapeHtml(data.subject), PREVIEW: escapeHtml(data.preview || `${data.activities.length} actividades en PUCMM Día a Día`),
+    SUBJECT: escapeHtml(data.subject), PREVIEW: escapeHtml(data.preview || "🗓️ Entérate de lo que ocurre en la PUCMM: conferencias, talleres y más."),
     TEST_BANNER: data.testMode ? `<mj-section css-class="test-banner"><mj-column><mj-text align="center"><b>[PRUEBA]</b> ${escapeHtml(data.digestType)} · ${escapeHtml(data.windowStart)} → ${escapeHtml(data.windowEndExclusive)}</mj-text></mj-column></mj-section>` : "",
     LOGO_URL: escapeHtml(data.logoUrl), INTRODUCTION: escapeHtml(data.introduction),
     TOP_AD: adBlock(top), ACTIVITIES_OR_EMPTY: data.activities.length ? activityRows(data.activities) : `<mj-section background-color="#ffffff" padding="18px 32px"><mj-column><mj-text align="center" color="#4a4a4a">No hay actividades publicadas para este período.</mj-text></mj-column></mj-section>`, BOTTOM_AD: adBlock(bottom),

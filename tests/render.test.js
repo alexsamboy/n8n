@@ -32,6 +32,11 @@ test("template includes responsive and accessible defaults", () => {
   assert.match(mjml, /Unidad Comunicación Interna/);
 });
 
+test("agenda uses the institutional descriptive preheader by default", () => {
+  const mjml = renderMjml({ ...base, preview: undefined, activities: [activity(1)], ads: [] });
+  assert.match(mjml, /<mj-preview>🗓️ Entérate de lo que ocurre en la PUCMM: conferencias, talleres y más\.<\/mj-preview>/);
+});
+
 test("activity location shows up to 34 characters before truncation", () => {
   const venue = "12345678901234567890123456789012345";
   const mjml = activityRows([{ ...activity(1), venue }]);
