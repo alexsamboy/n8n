@@ -1,6 +1,6 @@
 # Automatizaciones PUCMM en n8n
 
-Implementación para n8n `2.35.5` que obtiene actividades y banners desde
+Implementación para n8n `2.35.7` que obtiene actividades y banners desde
 WPGraphQL, normaliza fechas en `America/Santo_Domingo`, compila MJML localmente
 y envía un boletín mensual, semanal o diario según la fecha. El correo
 institucional sale por SMTP; el boletín mensual genera además una campaña en
@@ -11,7 +11,9 @@ Prensa**, que consulta `prensa.pucmm.edu.do`, reutiliza las bibliotecas MJML,
 SMTP y Brevo, y conserva sus coordinadores inactivos hasta su aprobación.
 
 Los coordinadores y el orquestador permanecen **inactivos** en los archivos
-importables. Las tres
+importables (`active=false`) para que una importación no active schedules ni
+envíos accidentalmente. Este valor no representa necesariamente el estado de
+los workflows ya publicados en producción. Las tres
 bibliotecas están publicadas porque n8n lo exige para ejecutar subworkflows,
 pero no tienen disparadores autónomos y no realizan envíos por sí solas.
 

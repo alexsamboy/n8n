@@ -30,7 +30,10 @@ test("Reusable workflows expose contract v1 and encapsulate delivery credentials
   assert.equal(smtpInputs.some((input) => input.name === "allowedDomains"), true);
   assert.equal(smtpInputs.some((input) => input.name === "idempotencyKey"), true);
   const credentialNodes = brevo.nodes.filter((node) => node.credentials?.sendInBlueApi);
-  assert.equal(credentialNodes.length, 2);
+  assert.deepEqual(
+    credentialNodes.map((node) => node.name).sort(),
+    ["Crear campaña Brevo", "Enviar prueba Brevo", "Programar campaña Brevo ahora"].sort(),
+  );
   assert.equal(credentialNodes.every((node) => node.credentials.sendInBlueApi.id === "brevo-shared"), true);
   const smtpCredentialNodes = smtp.nodes.filter((node) => node.credentials?.smtp);
   assert.equal(smtpCredentialNodes.length, 1);
