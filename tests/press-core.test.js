@@ -3,9 +3,16 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const p = require("../src/press-core");
 
-test("Monday fallback covers 72 hours and last success wins", () => {
+test("legacy fallback remains deterministic", () => {
   assert.equal(p.fallbackWindow("2026-08-24T14:00:00Z", null).windowStart, "2026-08-21T14:00:00.000Z");
   assert.equal(p.fallbackWindow("2026-08-24T14:00:00Z", "2026-08-20T15:00:00Z").windowStart, "2026-08-20T15:00:00.000Z");
+});
+
+test("daily window contains only the previous Dominican calendar day", () => {
+  assert.deepEqual(p.previousCalendarDayWindow("2026-08-26T14:00:00Z"), {
+    windowStart: "2026-08-25T04:00:00.000Z",
+    windowEndExclusive: "2026-08-26T04:00:00.000Z",
+  });
 });
 
 test("articles are sanitized, validated, deduplicated and sorted", () => {
@@ -32,6 +39,7 @@ test("removes Dominican dateline prefixes before truncating", () => {
 test("banner placement follows first, third, or last article", () => {
   const a = [1, 2].map(id => ({ id })); const b = [{ id: "a" }, { id: "b" }];
   assert.deepEqual(p.interleave(a, b).map(x => `${x.type}:${x.value.id}`), ["article:1", "banner:a", "article:2", "banner:b"]);
+  assert.deepEqual(p.interleave([{ id: 1 }], b).map(x => `${x.type}:${x.value.id}`), ["article:1", "banner:a"]);
   const three = p.interleave([...a, { id: 3 }], b).map(x => `${x.type}:${x.value.id}`);
   assert.deepEqual(three, ["article:1", "banner:a", "article:2", "article:3", "banner:b"]);
   assert.deepEqual(p.interleave([], b), []);

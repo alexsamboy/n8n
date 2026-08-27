@@ -56,6 +56,17 @@ function fallbackWindow(referenceNow, lastSuccess, mode = "since_last_success", 
   return { windowStart: new Date(end.valueOf() - hours * 3600000).toISOString(), windowEndExclusive: end.toISOString() };
 }
 
+function previousCalendarDayWindow(referenceNow) {
+  const now = new Date(referenceNow);
+  if (Number.isNaN(now.valueOf())) throw new Error("referenceNow inválido");
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONE, year: "numeric", month: "numeric", day: "numeric",
+  }).formatToParts(now).map(part => [part.type, part.value]));
+  const end = new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), 4));
+  const start = new Date(end.valueOf() - 24 * 3600000);
+  return { windowStart: start.toISOString(), windowEndExclusive: end.toISOString() };
+}
+
 function termName(value) {
   if (typeof value === "string") return cleanText(value);
   return cleanText(value?.nodes?.[0]?.name || value?.edges?.[0]?.node?.name);
@@ -106,8 +117,9 @@ function interleave(articles, banners) {
   articles.forEach((article, index) => {
     out.push({ type: "article", value: article });
     if (index === 0 && banners[0]) out.push({ type: "banner", value: banners[0] });
-    if (index === 2 && banners[1]) out.push({ type: "banner", value: banners[1] });
-    if (index === articles.length - 1 && articles.length < 3 && banners[1]) out.push({ type: "banner", value: banners[1] });
+    if (articles.length >= 2 && index === Math.min(2, articles.length - 1) && banners[1]) {
+      out.push({ type: "banner", value: banners[1] });
+    }
   });
   return out;
 }
@@ -115,4 +127,4 @@ function interleave(articles, banners) {
 function executionKey(start, end, group) { return crypto.createHash("sha256").update(`internal-press|${start}|${end}|${group}`).digest("hex"); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
-module.exports = { ZONE, OFFSET, cleanText, stripDatelinePrefix, truncateText, httpsUrl, fallbackWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };
+module.exports = { ZONE, OFFSET, cleanText, stripDatelinePrefix, truncateText, httpsUrl, fallbackWindow, previousCalendarDayWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };

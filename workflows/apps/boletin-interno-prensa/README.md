@@ -32,8 +32,10 @@ cabecera con divisores institucionales, artículos uniformes (imagen opcional
 redondeada, categoría/fecha, título sans-serif de 24 px, resumen Baskerville
 de 15 px y enlace «Leer más»), banners prioritarios, CTA, footer de Prensa y
 redes sociales HTTPS. La selección y las posiciones de anuncios se calculan
-antes de construir el MJML; con una sola noticia ambos anuncios, si existen,
-se colocan después de esa noticia sin perder ninguno.
+antes de construir el MJML. Una edición con una sola noticia utiliza únicamente
+el anuncio de mayor prioridad; con dos noticias coloca un anuncio después de
+cada una. Con tres o más noticias distribuye los dos anuncios sin dejarlos
+consecutivos.
 
 Los resúmenes prefieren `excerpt` cuando una fuente lo entrega y usan
 `content` como fallback. En el esquema autenticado actual de WPGraphQL de
@@ -60,6 +62,24 @@ las rutas de prueba manual conservan `testMode=true`, `developmentMode=true`
 y el correo de prueba institucional. El contenedor n8n fue reiniciado para
 cargar los cron activos.
 
+### Ventanas e idempotencia
+
+El coordinador diario procesa exclusivamente el día calendario anterior en
+`America/Santo_Domingo`: desde las 00:00 de ayer hasta las 00:00 de hoy, con
+el límite final exclusivo. No utiliza el último registro de la Data Table para
+ampliar la ventana; de este modo una noticia no reaparece en días posteriores.
+El horario continúa siendo de lunes a viernes, por lo que cada ejecución cubre
+solo el día inmediatamente anterior, incluso los lunes.
+
+El coordinador mensual procesa exclusivamente el mes calendario anterior. La
+fecha de producción se calcula en el momento de la ejecución; la fecha fija se
+reserva para la ruta manual de pruebas. Ambos productos generan una clave de
+ejecución determinística a partir de inicio, fin y grupo destinatario. Las
+bibliotecas SMTP y Brevo rechazan una segunda entrega de la misma ventana en
+el mismo canal y modo. Diario y mensual tienen ventanas, canales y grupos
+distintos: el mensual es un resumen deliberado y puede incluir noticias ya
+publicadas en boletines diarios.
+
 ## Importación segura
 
 1. Importe o publique primero las bibliotecas MJML y SMTP existentes.
@@ -73,7 +93,7 @@ cargar los cron activos.
 6. No active el coordinador hasta autorización explícita.
 
 Rollback: desactive el coordinador y restaure la revisión Git anterior. No
-elimine la Data Table, pues conserva idempotencia y cursor operativo.
+elimine la Data Table, pues conserva la auditoría e idempotencia de entregas.
 
 ## Evidencia de ejecución
 
@@ -101,7 +121,8 @@ un navegador compatible instalado en este host Rocky Linux.
 - La Data Table comunitaria no garantiza un lock atómico. Antes de activar el
   horario se recomienda un lock con PostgreSQL/Redis o impedir solapamientos a
   nivel operativo.
-- `legacy_calendar_days` no está habilitado: el modo implementado es
-  `since_last_success`, que evita omitir el domingo.
+- El diario no recupera automáticamente días omitidos si el schedule falla;
+  una recuperación debe ejecutarse manualmente con una ventana explícita y en
+  modo controlado para no romper la regla de un día por edición.
 - El manejador sanitiza el error, pero la notificación se habilitará cuando se
   confirme el correo operativo de alertas.
