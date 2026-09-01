@@ -8,10 +8,17 @@ test("legacy fallback remains deterministic", () => {
   assert.equal(p.fallbackWindow("2026-08-24T14:00:00Z", "2026-08-20T15:00:00Z").windowStart, "2026-08-20T15:00:00.000Z");
 });
 
-test("daily window contains only the previous Dominican calendar day", () => {
-  assert.deepEqual(p.previousCalendarDayWindow("2026-08-26T14:00:00Z"), {
+test("daily delivery window uses the previous Dominican calendar day on weekdays", () => {
+  assert.deepEqual(p.previousDeliveryWindow("2026-08-26T14:00:00Z"), {
     windowStart: "2026-08-25T04:00:00.000Z",
     windowEndExclusive: "2026-08-26T04:00:00.000Z",
+  });
+});
+
+test("Monday delivery window includes Friday through Sunday", () => {
+  assert.deepEqual(p.previousDeliveryWindow("2026-08-31T14:00:00Z"), {
+    windowStart: "2026-08-28T04:00:00.000Z",
+    windowEndExclusive: "2026-08-31T04:00:00.000Z",
   });
 });
 

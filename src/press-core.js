@@ -56,14 +56,15 @@ function fallbackWindow(referenceNow, lastSuccess, mode = "since_last_success", 
   return { windowStart: new Date(end.valueOf() - hours * 3600000).toISOString(), windowEndExclusive: end.toISOString() };
 }
 
-function previousCalendarDayWindow(referenceNow) {
+function previousDeliveryWindow(referenceNow) {
   const now = new Date(referenceNow);
   if (Number.isNaN(now.valueOf())) throw new Error("referenceNow inválido");
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
     timeZone: ZONE, year: "numeric", month: "numeric", day: "numeric",
   }).formatToParts(now).map(part => [part.type, part.value]));
   const end = new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day), 4));
-  const start = new Date(end.valueOf() - 24 * 3600000);
+  const lookbackDays = localWeekday(now) === 1 ? 3 : 1;
+  const start = new Date(end.valueOf() - lookbackDays * 24 * 3600000);
   return { windowStart: start.toISOString(), windowEndExclusive: end.toISOString() };
 }
 
@@ -127,4 +128,4 @@ function interleave(articles, banners) {
 function executionKey(start, end, group) { return crypto.createHash("sha256").update(`internal-press|${start}|${end}|${group}`).digest("hex"); }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
-module.exports = { ZONE, OFFSET, cleanText, stripDatelinePrefix, truncateText, httpsUrl, fallbackWindow, previousCalendarDayWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };
+module.exports = { ZONE, OFFSET, cleanText, stripDatelinePrefix, truncateText, httpsUrl, fallbackWindow, previousDeliveryWindow, normalizeArticle, dedupeSortArticles, normalizeBanner, selectBanners, interleave, executionKey, escapeHtml };

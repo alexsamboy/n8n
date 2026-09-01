@@ -49,8 +49,8 @@
       }
     },
     {
-      "id": "56616da6cfacd713",
-      "name": "Calcular día anterior",
+      "id": "b7b5670c2bd23c48",
+      "name": "Calcular ventana diaria",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -58,7 +58,7 @@
         -100
       ],
       "parameters": {
-        "jsCode": "const zone='America/Santo_Domingo';const manual=$execution.mode==='manual'&&!$json.referenceNow&&!$json.windowStart&&!$json.windowEndExclusive;const testNow='2026-08-20T23:00:00-04:00';const testStart='2026-08-19T00:00:00-04:00';const testEnd='2026-08-20T00:00:00-04:00';const now=manual?new Date(testNow):$json.referenceNow?new Date($json.referenceNow):new Date();if(Number.isNaN(now.valueOf()))throw new Error('referenceNow inválido');const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:zone,year:'numeric',month:'numeric',day:'numeric'}).formatToParts(now).map(x=>[x.type,x.value]));const calendarEnd=new Date(Date.UTC(+p.year,+p.month-1,+p.day,4));const start=manual?new Date(testStart):$json.windowStart?new Date($json.windowStart):new Date(calendarEnd.valueOf()-86400000);const end=manual?new Date(testEnd):$json.windowEndExclusive?new Date($json.windowEndExclusive):calendarEnd;if(Number.isNaN(start.valueOf())||Number.isNaN(end.valueOf())||start>=end)throw new Error('Ventana inválida');return [{json:{referenceNow:now.toISOString(),windowStart:start.toISOString(),windowEndExclusive:end.toISOString(),recipientGroup:'internal-community',digestType:'daily',emailTransport:'smtp',testMode:manual,developmentMode:manual,forceResend:manual,windowSource:manual?'fixed_test_2026-08-19':'previous_calendar_day'}}];"
+        "jsCode": "const zone='America/Santo_Domingo';const manual=$execution.mode==='manual'&&!$json.referenceNow&&!$json.windowStart&&!$json.windowEndExclusive;const testNow='2026-08-20T23:00:00-04:00';const testStart='2026-08-19T00:00:00-04:00';const testEnd='2026-08-20T00:00:00-04:00';const now=manual?new Date(testNow):$json.referenceNow?new Date($json.referenceNow):new Date();if(Number.isNaN(now.valueOf()))throw new Error('referenceNow inválido');const p=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:zone,year:'numeric',month:'numeric',day:'numeric',weekday:'short'}).formatToParts(now).map(x=>[x.type,x.value]));const calendarEnd=new Date(Date.UTC(+p.year,+p.month-1,+p.day,4));const weekday=p.weekday;const lookbackDays=weekday==='Mon'?3:1;const start=manual?new Date(testStart):$json.windowStart?new Date($json.windowStart):new Date(calendarEnd.valueOf()-lookbackDays*86400000);const end=manual?new Date(testEnd):$json.windowEndExclusive?new Date($json.windowEndExclusive):calendarEnd;if(Number.isNaN(start.valueOf())||Number.isNaN(end.valueOf())||start>=end)throw new Error('Ventana inválida');return [{json:{referenceNow:now.toISOString(),windowStart:start.toISOString(),windowEndExclusive:end.toISOString(),recipientGroup:'internal-community',digestType:'daily',emailTransport:'smtp',testMode:manual,developmentMode:manual,forceResend:manual,windowSource:manual?'fixed_test_2026-08-19':'previous_delivery_window'}}];"
       }
     },
     {
@@ -87,7 +87,7 @@
       "main": [
         [
           {
-            "node": "Calcular día anterior",
+            "node": "Calcular ventana diaria",
             "type": "main",
             "index": 0
           }
@@ -116,7 +116,7 @@
         ]
       ]
     },
-    "Calcular día anterior": {
+    "Calcular ventana diaria": {
       "main": [
         [
           {

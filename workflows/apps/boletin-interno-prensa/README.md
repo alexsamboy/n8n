@@ -5,7 +5,7 @@
 - `coordination/scheduler.json` — `APP — Prensa PUCMM — Boletín interno`, ID
   `f54704c5e44f602a`; horario 10:00, lunes a viernes, inactivo al importar.
 - `coordination/monthly.json` — `APP — Prensa PUCMM — Boletín mensual`, ID
-  `e1a71f7ed90c4ef4`; primer lunes, mes calendario anterior, inactivo al
+  `e1a71f7ed90c4ef4`; primer día laborable, mes calendario anterior, inactivo al
   importar.
 - `orchestration/build-send.json` — `ORCH — Prensa PUCMM — Construir y
   enviar`, ID `654286fe97f96096`; único constructor compartido: selecciona
@@ -24,6 +24,16 @@
 Los coordinadores se importan inactivos. El orquestador está bloqueado en modo
 desarrollo: fuerza `testMode=true` y solo permite el destinatario de pruebas
 `manuelperez@pucmm.edu.do`, aunque una entrada intente cambiar ese indicador.
+El diario usa la ventana del día calendario anterior de martes a viernes. Los
+lunes usa `[viernes 00:00, lunes 00:00)` en `America/Santo_Domingo`, por lo que
+recupera las publicaciones de viernes, sábado y domingo sin solapar el martes.
+
+La campaña 999 de agosto 2026 fue cancelada después de que n8n la registrara
+como programada. La prueba manual mensual queda fijada temporalmente a agosto
+de 2026 y continúa restringida al canal de pruebas Brevo. Un reenvío de
+producción requiere autorización explícita porque debe usar una nueva clave de
+idempotencia.
+
 No existe una rama `dryRun` dentro del orquestador; una ejecución manual solo
 puede enviar a esa dirección de prueba.
 
