@@ -21,9 +21,10 @@
   `LIB — Mensajería — Campaña Brevo`.
 - Data Table `Boletín Interno Prensa — estado`, ID `nRoI0Ta5SQizvi0U`.
 
-Los coordinadores se importan inactivos. El orquestador está bloqueado en modo
-desarrollo: fuerza `testMode=true` y solo permite el destinatario de pruebas
-`manuelperez@pucmm.edu.do`, aunque una entrada intente cambiar ese indicador.
+Los coordinadores se importan inactivos. En la instancia publicada, las ramas
+programadas pasan `testMode=false` y utilizan los canales productivos; las
+rutas manuales pasan `testMode=true`, `developmentMode=true` y permanecen
+restringidas a los destinatarios de prueba configurados.
 El diario usa la ventana del día calendario anterior de martes a viernes. Los
 lunes usa `[viernes 00:00, lunes 00:00)` en `America/Santo_Domingo`, por lo que
 recupera las publicaciones de viernes, sábado y domingo sin solapar el martes.
@@ -33,6 +34,10 @@ como programada. La prueba manual mensual queda fijada temporalmente a agosto
 de 2026 y continúa restringida al canal de pruebas Brevo. Un reenvío de
 producción requiere autorización explícita porque debe usar una nueva clave de
 idempotencia.
+
+El detalle del incidente, las ejecuciones verificadas y la decisión de no
+reenviar agosto están en
+[`docs/press-delivery-audit-2026-09-01.md`](../../../docs/press-delivery-audit-2026-09-01.md).
 
 No existe una rama `dryRun` dentro del orquestador; una ejecución manual solo
 puede enviar a esa dirección de prueba.
@@ -74,16 +79,18 @@ cargar los cron activos.
 
 ### Ventanas e idempotencia
 
-El coordinador diario procesa exclusivamente el día calendario anterior en
-`America/Santo_Domingo`: desde las 00:00 de ayer hasta las 00:00 de hoy, con
-el límite final exclusivo. No utiliza el último registro de la Data Table para
-ampliar la ventana; de este modo una noticia no reaparece en días posteriores.
-El horario continúa siendo de lunes a viernes, por lo que cada ejecución cubre
-solo el día inmediatamente anterior, incluso los lunes.
+El coordinador diario usa ventanas determinísticas en
+`America/Santo_Domingo`, siempre con límite final exclusivo. De martes a
+viernes procesa `[ayer 00:00, hoy 00:00)`. Los lunes procesa
+`[viernes 00:00, lunes 00:00)`, incluyendo viernes, sábado y domingo. No usa un
+cursor mutable ni el último registro de la Data Table para ampliar la ventana.
 
-El coordinador mensual procesa exclusivamente el mes calendario anterior. La
-fecha de producción se calcula en el momento de la ejecución; la fecha fija se
-reserva para la ruta manual de pruebas. Ambos productos generan una clave de
+El coordinador mensual procesa exclusivamente el mes calendario anterior. El
+Schedule Trigger se evalúa a las 10:00 durante los días 1, 2 y 3; una guarda
+permite continuar solo el primer día de lunes a viernes, o el lunes 2/3 cuando
+el mes comenzó en fin de semana. La fecha de producción se calcula en el
+momento de la ejecución; la fecha fija se reserva para la ruta manual de
+pruebas. Ambos productos generan una clave de
 ejecución determinística a partir de inicio, fin y grupo destinatario. Las
 bibliotecas SMTP y Brevo rechazan una segunda entrega de la misma ventana en
 el mismo canal y modo. Diario y mensual tienen ventanas, canales y grupos
@@ -131,8 +138,8 @@ un navegador compatible instalado en este host Rocky Linux.
 - La Data Table comunitaria no garantiza un lock atómico. Antes de activar el
   horario se recomienda un lock con PostgreSQL/Redis o impedir solapamientos a
   nivel operativo.
-- El diario no recupera automáticamente días omitidos si el schedule falla;
-  una recuperación debe ejecutarse manualmente con una ventana explícita y en
-  modo controlado para no romper la regla de un día por edición.
+- La recuperación del fin de semana está limitada a la ejecución normal del
+  lunes. Si falla un schedule, cualquier recuperación adicional debe ejecutarse
+  manualmente con una ventana explícita y en modo controlado.
 - El manejador sanitiza el error, pero la notificación se habilitará cuando se
   confirme el correo operativo de alertas.
