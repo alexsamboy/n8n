@@ -194,6 +194,12 @@ function dedupeAndSort(activities) {
   return [...unique.values()].sort((a, b) => a.startAt.localeCompare(b.startAt) || a.title.localeCompare(b.title, "es") || a.id.localeCompare(b.id));
 }
 
+function filterCurrentActivities(activities, reference) {
+  const at = new Date(reference);
+  if (Number.isNaN(at.valueOf())) throw new Error("Invalid reference date");
+  return activities.filter((activity) => new Date(activity.endAt || activity.startAt) >= at);
+}
+
 function executionKey(digestType, windowStart, windowEndExclusive, recipientGroup) {
   return crypto.createHash("sha256").update(`${digestType}|${windowStart}|${windowEndExclusive}|${recipientGroup}`).digest("hex");
 }
@@ -229,6 +235,6 @@ async function paginateConnection(fetchPage, maxPages = 100) {
 
 module.exports = {
   ZONE, OFFSET, MONTHS, digestWindow, combineWpDateTime, cleanText, safeHttps,
-  normalizeActivity, overlaps, normalizeAd, selectAds, dedupeAndSort,
+  normalizeActivity, overlaps, normalizeAd, selectAds, dedupeAndSort, filterCurrentActivities,
   executionKey, escapeHtml, displayDate, displayTime, paginateConnection,
 };

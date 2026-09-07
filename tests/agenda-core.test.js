@@ -41,6 +41,15 @@ test("normalization rejects unsafe URL and end before start", () => {
   assert.equal(result.activity.title, "Evento");
 });
 
+test("filters activities that already ended before the digest reference", () => {
+  const activities = [
+    { id: "expired", startAt: "2026-09-04T10:00:00-04:00", endAt: "2026-09-04T11:00:00-04:00" },
+    { id: "ongoing", startAt: "2026-09-07T07:00:00-04:00", endAt: "2026-09-07T09:00:00-04:00" },
+    { id: "future", startAt: "2026-09-08T10:00:00-04:00", endAt: "2026-09-08T11:00:00-04:00" },
+  ];
+  assert.deepEqual(core.filterCurrentActivities(activities, "2026-09-07T08:00:00-04:00").map((activity) => activity.id), ["ongoing", "future"]);
+});
+
 test("overlap includes ongoing and boundary-start events, excludes exclusive end", () => {
   const from = "2026-08-20T00:00:00-04:00";
   const to = "2026-08-21T00:00:00-04:00";
