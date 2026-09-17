@@ -21,6 +21,7 @@ const expected = [
   "apps/boletin-aliados/orchestration/build-send-campaign.json",
   "apps/boletin-aliados/operations/error-handler.json",
   "apps/boletin-aliados/operations/campaign-report.json",
+  "ops/scheduler-canary.json",
 ];
 let failed = false;
 for (const file of expected) {

@@ -1,0 +1,20 @@
+[
+  {
+    "timestamp": "2026-09-14T10:00:00-04:00",
+    "source": "schedule",
+    "detail": "Synthetic expected schedule",
+    "evidence": "correlated"
+  },
+  {
+    "timestamp": "2026-09-14T14:01:29.869Z",
+    "source": "execution_entity",
+    "detail": "Synthetic execution created",
+    "evidence": "observed"
+  },
+  {
+    "timestamp": "2026-09-14T14:01:30Z",
+    "source": "dns",
+    "detail": "Synthetic DNS observation",
+    "evidence": "observed"
+  }
+]

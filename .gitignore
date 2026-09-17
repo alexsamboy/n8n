@@ -3,7 +3,11 @@
 !.env.example
 node_modules/
 coverage/
+__pycache__/
+*.py[cod]
 *.html
 *.log
+logs/health/**
+!logs/health/.gitkeep
 credentials/
 .playwright-cli/

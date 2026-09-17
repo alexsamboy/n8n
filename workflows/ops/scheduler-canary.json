@@ -1,0 +1,85 @@
+{
+  "id": "tbx6sWxc32iNWGFz",
+  "name": "OPS - Scheduler Canary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/5 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "ops-scheduler-canary-trigger",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ops-canary-kind",
+              "name": "canary_kind",
+              "value": "scheduler_only",
+              "type": "string"
+            },
+            {
+              "id": "ops-canary-observed-at",
+              "name": "observed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "ops-scheduler-canary-set",
+      "name": "Record observation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Every 5 minutes": {
+      "main": [
+        [
+          {
+            "node": "Record observation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santo_Domingo",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": false,
+    "availableInMCP": false
+  },
+  "versionId": "7a2aca70-ced8-4ef1-a877-e6216b86df07",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": [],
+  "description": "Canary inactivo para medir exclusivamente Schedule Trigger y persistencia de ejecuciones. Requiere autorización separada para importar y activar."
+}
