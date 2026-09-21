@@ -107,7 +107,12 @@ temporalmente a `true`, lo que dirige SMTP a
 
 En producción, SMTP utiliza exclusivamente:
 
-- `comunidad@pucmm.edu.do`
+- `ComunidadCSTI@pucmm.edu.do`
+- `ComunidadCSD@pucmm.edu.do`
+- `sd-docentes@ce.pucmm.edu.do`
+- `st-docentes@ce.pucmm.edu.do`
+- `DirectoresAcademicos-CSD@pucmm.edu.do`
+- `directoresacademicos-csti@pucmm.edu.do`
 - `st-estudiante@ce.pucmm.edu.do`
 - `sd-estudiante@ce.pucmm.edu.do`
 

@@ -43,7 +43,7 @@ test("Reusable workflows expose contract v1 and encapsulate delivery credentials
 test("Agenda uses one internal recipient list and the institutional sender name", () => {
   const config = agenda.nodes.find((node) => node.name === "Configuración segura");
   const values = Object.fromEntries(config.parameters.assignments.assignments.map((assignment) => [assignment.name, assignment.value]));
-  assert.equal(values.emailToInternal, "comunidad@pucmm.edu.do,st-estudiante@ce.pucmm.edu.do,sd-estudiante@ce.pucmm.edu.do");
+  assert.equal(values.emailToInternal, "ComunidadCSTI@pucmm.edu.do,ComunidadCSD@pucmm.edu.do,sd-docentes@ce.pucmm.edu.do,st-docentes@ce.pucmm.edu.do,DirectoresAcademicos-CSD@pucmm.edu.do,directoresacademicos-csti@pucmm.edu.do,st-estudiante@ce.pucmm.edu.do,sd-estudiante@ce.pucmm.edu.do");
   assert.equal(values.emailToDaily, undefined);
   assert.equal(values.emailToWeekly, undefined);
   assert.equal(values.emailToMonthly, undefined);

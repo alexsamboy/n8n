@@ -143,7 +143,7 @@
             {
               "id": "press-cfg-13",
               "name": "emailTo",
-              "value": "comunidad@pucmm.edu.do,st-estudiante@ce.pucmm.edu.do,sd-estudiante@ce.pucmm.edu.do",
+              "value": "ComunidadCSTI@pucmm.edu.do,ComunidadCSD@pucmm.edu.do,sd-docentes@ce.pucmm.edu.do,st-docentes@ce.pucmm.edu.do,DirectoresAcademicos-CSD@pucmm.edu.do,directoresacademicos-csti@pucmm.edu.do,st-estudiante@ce.pucmm.edu.do,sd-estudiante@ce.pucmm.edu.do",
               "type": "string"
             },
             {
