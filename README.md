@@ -179,6 +179,8 @@ de su biblioteca. Los IDs usados por el orquestador son
 El descubrimiento verificable de campos está en
 [docs/wordpress-source-audit.md](docs/wordpress-source-audit.md). El estado de
 seguridad está en [security_best_practices_report.md](security_best_practices_report.md).
+La auditoría de ejecuciones de la semana del 5 al 9 de octubre de 2026 está en
+[docs/execution-audit-2026-10-05-2026-10-09.md](docs/execution-audit-2026-10-05-2026-10-09.md).
 
 ## Boletín Interno Prensa
 
